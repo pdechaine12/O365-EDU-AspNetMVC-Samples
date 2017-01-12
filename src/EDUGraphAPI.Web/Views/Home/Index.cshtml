@@ -1,0 +1,43 @@
+﻿@model UserContext
+@{
+    ViewBag.Title = "Home Page";
+}
+
+
+@*<h2>Welcome to the EDUGraphAPI</h2>
+
+@if (!Model.AreAccountsLinked)
+{
+    <div id="linkAccountPrompt">
+        <p>Hello, @Model.UserDisplayName</p>
+        <p>Do you want to link your accounts?</p>
+        <p>
+            @Html.ActionLink("Yes", "Index", "Link", null, new { @class = "btn btn-primary" })
+            @if (Model.IsO365Account)
+            {
+                @Html.ActionLink("No", "Index", "Schools", null, new { @class = "btn btn-default" })
+            }
+            else
+            {
+                <a id="skipLinkAccount" class="btn btn-default">No</a>
+            }
+        </p>
+    </div>
+}
+else if (Model.User.Organization != null && !Model.User.Organization.IsAdminConsented)
+{
+    <div class="warning">
+        <p>Data from Office 365 SDS APIs is not shown until your tenant admin grants consent to the application.</p>
+        <p>Please tell your admin to do this.</p>
+    </div>
+}
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('#skipLinkAccount').on('click', function () {
+                $('#linkAccountPrompt').hide();
+            });
+        });
+    </script>
+}*@

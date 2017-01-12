@@ -1,0 +1,76 @@
+﻿@model UserContext
+@{
+    ViewBag.Title = "Link Office 365 & Local Account";
+    var localAccountExistedMessage = ViewBag.LocalAccountExistedMessage as string;
+    var localAccountExisted = localAccountExistedMessage.IsNotNullAndEmpty();
+}
+
+<h2>@ViewBag.Title</h2>
+
+@if (!Model.AreAccountsLinked)
+{
+    <p>This page will enable you to link your Office 365 & Local Account together to successfully use the demo application.</p>
+    if (Model.IsLocalAccount)
+    {
+        <div class="form-horizontal" id="linkAccountPrompt">
+            <hr />
+            @using (Html.BeginForm("LoginO365", null, FormMethod.Post, null))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true)
+                <p>
+                    <input type="submit" value="Use Existing O365 account" class="btn btn-primary" /> &nbsp; &nbsp;
+                    @Html.ActionLink("Cancel", "index", "Schools", null, new { @class = "btn btn-primary" })
+                </p>
+            }
+        </div>
+    }
+    else
+    {
+        <hr />
+        <div class="form-horizontal">
+            @if (localAccountExisted)
+            {
+                <p>@localAccountExistedMessage</p>
+            }
+            <p>
+                @Html.ActionLink("Use Existing Local Account", "LoginLocal", null, new { @class = "btn btn-primary" }) &nbsp; &nbsp;
+                @{ 
+                    var htmlAttributes = new RouteValueDictionary(new { @class = "btn btn-primary" });
+                    if (localAccountExisted)
+                    {
+                        htmlAttributes.Add("disabled", "disabled");
+                        htmlAttributes.Add("href", "javascript:void(0)");
+                    }
+                    @Html.ActionLink("Create Local Account", "CreateLocalAccount", null, htmlAttributes)
+                    @:&nbsp; &nbsp;
+                }
+                @Html.ActionLink("Cancel", "index", "Schools", null, new { @class = "btn btn-primary" })
+            </p>
+
+        </div>
+    }
+}
+else
+{
+    <div>
+        <p>Your local account and Office 365 account are now linked.</p>
+        <p>
+            <ul>
+                <li>Local account: @Model.User.Email</li>
+                <li>Office 365 account: @Model.User.O365Email</li>
+            </ul>
+        </p>
+        <p>@Html.ActionLink("Return to home", "Index", "Home", null, new { @class = "btn btn-default" })</p>
+    </div>
+}
+
+@section scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('#skipLinkAccount').on('click', function () {
+                $('#linkAccountPrompt').hide();
+            });
+        });
+    </script>
+}
