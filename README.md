@@ -755,29 +755,4 @@ So far, It is only used on the **SchoolsController**.
 * **`Functions`**: contains the `SyncUsersAsync` method which is executed regularly to sync users data.
 * **`Program`**: contains the `Main` method which configure and start the WebJob host.
 
-## Contributors
-
-| Roles                                    | Author(s)                                |
-| ---------------------------------------- | ---------------------------------------- |
-| Project Lead / Architect / Documentation | Todd Baginski (Microsoft MVP, Canviz Consulting) @tbag |
-| PM                                       | John Trivedi (Canviz Consulting)         |
-| Development Leader / Documentation       | Tyler Lu (Canviz Consulting) @TylerLu    |
-| Developer                                | Benny Zhang (Canviz Consulting)          |
-| Testing                                  | Ring Li (Canviz Consulting)              |
-| Testing                                  | Melody She (Canviz Consulting)           |
-| UX Design                                | Justin So (Canviz Consulting)            |
-| Code Reviews / Documentation             | Michael Sherman (Canviz Consulting) @canvizsherm |
-| Sponsor / Support                        | TJ Vering (Microsoft) @TJVering          |
-| Sponsor / Support                        | Alok Kumar Bansal (Microsoft)            |
-| Sponsor / Support                        | Kaushik Barat (Microsoft) @kaubar        |
-| Sponsor / Support                        | Kundana Palagiri (Microsoft)             |
-| Sponsor / Support                        | Zion Brewer (Microsoft) @zckb            |
-
-## Version history
-
-| Version | Date         | Comments        |
-| ------- | ------------ | --------------- |
-| 1.0     | Nov 26, 2016 | Initial release |
-
-## Disclaimer
-**THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.**
+**Copyright (c) 2017 Microsoft. All rights reserved.**
