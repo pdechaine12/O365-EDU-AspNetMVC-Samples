@@ -110,7 +110,7 @@ Download and install the following tools to run, build and/or develop this appli
 
    ![](Images/aad-configure-app-02.png)
 
-11. Enable **USER ASSIGNMENT REQUIRED TO ACCESS APP**.
+11. [Optional] Enable **USER ASSIGNMENT REQUIRED TO ACCESS APP**.
 
    ![](Images/aad-configure-app-05.png)
 
@@ -190,7 +190,42 @@ Download and install the following tools to run, build and/or develop this appli
 
    ![](Images/aad-add-reply-url.png)
 
+   > Note: please also add https://localhost:44311/ then you are able to debug the sample locally.
+
 4. Click **SAVE**.
+
+**Debug the sample locally**
+
+1. Debug the **EDUGraphAPI.Web**:
+
+   Configure the **Web.config**. 
+
+   ![](Images/web-app-config.png)
+
+   * **Connection Strings**: 
+     * **DefaultConnection**: you may create a local SQL Server database or use the one created in the Azure.
+   * **App Settings**: 
+     * **BingMapKey**: use the key of Bing Map you got earlier.
+     * **ida:ClientId**: use the Client Id of the AAD Application your created earlier.
+     * **ida:ClientSecret**: use the Key value of the AAD Application your created earlier.
+     * **SourceCodeRepositoryURL**: use the repository URL of your fork.
+
+   Set **EDUGraphAPI.Web** as StartUp project, and press F5. 
+
+2. Debug the **EDUGraphAPI.SyncData**:
+
+   Configure the **App.config**:
+
+   ![](Images/webjob-app-config.png)
+
+   * **Connection Strings**:
+     * **AzureWebJobsDashboard**: create a new storage account and use its connection string.
+     * **AzureWebJobsStorage**: use the same connection string as **AzureWebJobsDashboard**.
+     * **DefaultConnection**: use the same connection string used above for the Web.config.
+   * **App Settings**:
+     * **ida:ClientId**: use the Client Id of the AAD Application your created earlier.
+
+   Set **EDUGraphAPI.SyncData** as StartUp project, and press F5. 
 
 ## Documentation
 
