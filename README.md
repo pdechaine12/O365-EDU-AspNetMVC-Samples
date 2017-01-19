@@ -757,4 +757,13 @@ So far, It is only used on the **SchoolsController**.
 * **`Functions`**: contains the `SyncUsersAsync` method which is executed regularly to sync users data.
 * **`Program`**: contains the `Main` method which configure and start the WebJob host.
 
+##Questions and comments##
+* If you have any trouble running this sample, please [log an issue](https://github.com/OfficeDev/O365-EDU-AspNetMVC-Samples/issues).
+* Questions about GraphAPI development in general should be posted to [Stack Overflow](http://stackoverflow.com/questions/tagged/office-addins). Make sure that your questions or comments are tagged with [ms-graph-api]. 
+
+##Contributing## 
+We encourage you to contribute to our samples. For guidelines on how to proceed, see our contribution guide
+
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
 **Copyright (c) 2017 Microsoft. All rights reserved.**
