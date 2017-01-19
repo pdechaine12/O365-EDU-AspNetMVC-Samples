@@ -13,7 +13,7 @@ EDUGraphAPI  is a sample that demonstrates:
 
   After linking accounts, users can use either local or Office 365 accounts to log into the sample web site and use it.
 
-* Geting schools, sections, teachers, and students from Office 365 Education:
+* Getting schools, sections, teachers, and students from Office 365 Education:
 
   * [Office 365 Schools REST API reference](https://msdn.microsoft.com/office/office365/api/school-rest-operations)
 
@@ -35,7 +35,9 @@ Download and install the following tools to run, build and/or develop this appli
    - Sign into your GitHub account where you forked this repository.
    - Click **Generate Token**
    - Enter a value in the **Token description** text box
-   - Select all the **check boxes**
+   - Select the following s (your selections should match the screenshot below):
+         - repo (all) -> repo:status, repo_deployment, public_repo
+         - admin:repo_hook -> read:repo_hook
 
    ![](Images/github-new-personal-access-token.png)
 
@@ -119,7 +121,7 @@ Download and install the following tools to run, build and/or develop this appli
 |                                | Application Permissions       | Delegated Permissions                    |
 | ------------------------------ | ----------------------------- | ---------------------------------------- |
 | Windows Azure Active Directory | Read and write directory data | Sign in and read user profile<br>Read and write directory data |
-| Microsoft Graph                | Read all users' full profiles | Read all groups<br>Read directory data<br>Access directory as the signed in user<br>Sign user in |
+| Microsoft Graph                | Read all users' full profiles | Read all groups<br>Read directory data<br>Access directory as the signed in user<br>Sign users in |
 
 12. In the keys section, click the dropdown list and select a duration, then click **Save**.
 
@@ -277,7 +279,7 @@ For more information, see [Build a multi-tenant SaaS web application using Azure
 
 This is the WebJob used to sync user data. In the **Functions.SyncUsersAsync** method, **UserSyncService** from EDUGraphAPI.Common project is used.
 
-The project was created to demonstrate differential query. Please check [Different query](#differential-query) section for more details.
+The project was created to demonstrate differential query. Please check [Differential query](#differential-query) section for more details.
 
 **EDUGraphAPI.Common**
 
