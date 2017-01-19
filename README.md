@@ -16,14 +16,13 @@ EDUGraphAPI  is a sample that demonstrates:
 * Getting schools, sections, teachers, and students from Office 365 Education:
 
   * [Office 365 Schools REST API reference](https://msdn.microsoft.com/office/office365/api/school-rest-operations)
-
-  * A [Differential Query](https://msdn.microsoft.com/en-us/library/azure/ad/graph/howto/azure-ad-graph-api-differential-query) is used to sync data that is cached in a local database by the SyncData Web Job.
+  * A [Differential Query](https://msdn.microsoft.com/en-us/library/azure/ad/graph/howto/azure-ad-graph-api-differential-query) is used to sync data that is cached in a local database by the SyncData Web Job.
 
 EDUGraphAPI is based on ASP.NET MVC. [ASP.NET Identity](https://www.asp.net/identity) is used in this project.
 
 ## How To: Configure your Development Environment
 
-Download and install the following tools to run, build and/or develop this application locally.
+This project can be opened with the edition of Visual Studion 2015 you already have, or download and install the the Community edition to run, build and/or develop this application locally.
 
 - [Visual Studio 2015 Community](https://go.microsoft.com/fwlink/?LinkId=691978&clcid=0x409)
 
@@ -757,13 +756,17 @@ So far, It is only used on the **SchoolsController**.
 * **`Functions`**: contains the `SyncUsersAsync` method which is executed regularly to sync users data.
 * **`Program`**: contains the `Main` method which configure and start the WebJob host.
 
-##Questions and comments##
+##Questions and comments
+
 * If you have any trouble running this sample, please [log an issue](https://github.com/OfficeDev/O365-EDU-AspNetMVC-Samples/issues).
 * Questions about GraphAPI development in general should be posted to [Stack Overflow](http://stackoverflow.com/questions/tagged/office-addins). Make sure that your questions or comments are tagged with [ms-graph-api]. 
 
-##Contributing## 
+##Contributing
+
 We encourage you to contribute to our samples. For guidelines on how to proceed, see our contribution guide
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
+
 
 **Copyright (c) 2017 Microsoft. All rights reserved.**
