@@ -1,5 +1,10 @@
-﻿using EDUGraphAPI.Data;
+﻿/*   
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+ */
+using EDUGraphAPI.Data;
 using EDUGraphAPI.Utils;
+using EDUGraphAPI.Web.Services;
 using EDUGraphAPI.Web.Services.GraphClients;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Owin.Security;
@@ -45,6 +50,10 @@ namespace EDUGraphAPI.Web
                             string appBaseUrl = context.Request.Scheme + "://" + context.Request.Host + context.Request.PathBase;
                             context.ProtocolMessage.RedirectUri = appBaseUrl + "/";
                             context.ProtocolMessage.PostLogoutRedirectUri = appBaseUrl;
+                            CookieService cookieService = new CookieService();
+                            string hint =  cookieService.GetCookiesOfEmail();
+                            if(!string.IsNullOrEmpty(hint))
+                                context.ProtocolMessage.LoginHint = hint;
                             return Task.FromResult(0);
                         },
                         AuthorizationCodeReceived = async (context) =>

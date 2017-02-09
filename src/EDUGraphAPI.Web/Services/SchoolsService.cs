@@ -1,10 +1,13 @@
-﻿using EDUGraphAPI.Data;
+﻿/*   
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+ */
+using EDUGraphAPI.Data;
 using EDUGraphAPI.Web.Models;
 using EDUGraphAPI.Web.ViewModels;
 using Microsoft.Education;
 using Microsoft.Education.Data;
 using Microsoft.Graph;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -86,7 +89,7 @@ namespace EDUGraphAPI.Web.Services
             var mySections = await educationServiceClient.GetMySectionsAsync(school.SchoolId);
             mySections = mySections.OrderBy(c => c.CombinedCourseNumber).ToArray();
             var allSections = await educationServiceClient.GetAllSectionsAsync(school.SchoolId, top, null);
-            return new SectionsViewModel(userContext.UserO365Email, school, allSections, mySections);
+            return new SectionsViewModel(userContext, school, allSections, mySections);
         }
 
         /// <summary>

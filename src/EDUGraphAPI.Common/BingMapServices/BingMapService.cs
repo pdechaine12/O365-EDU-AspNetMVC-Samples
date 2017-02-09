@@ -1,4 +1,8 @@
-﻿using Microsoft.Education.Data;
+﻿/*   
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+ */
+using Microsoft.Education.Data;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -29,10 +33,10 @@ namespace EDUGraphAPI
             List<string> result =new List<string>(2) ;
             var client = new HttpClient();
             var uri = string.Format(BingMapApiURL, address);
-            var response = await client.GetAsync(uri);
-            response.EnsureSuccessStatusCode();
             try
             {
+                var response = await client.GetAsync(uri);
+                response.EnsureSuccessStatusCode();
                 JObject json = (JObject)JsonConvert.DeserializeObject(response.Content.ReadAsStringAsync().Result);
                 var coordinates = json["resourceSets"][0]["resources"][0]["point"]["coordinates"];
                 result.Add(coordinates[0].ToString());

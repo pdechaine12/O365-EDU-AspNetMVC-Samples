@@ -1,12 +1,18 @@
-﻿using EDUGraphAPI.Data;
+﻿/*   
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+ */
+using EDUGraphAPI.Data;
 using EDUGraphAPI.Web.Infrastructure;
 using EDUGraphAPI.Web.Models;
+using EDUGraphAPI.Web.Services;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.OpenIdConnect;
+using System;
 using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,11 +26,18 @@ namespace EDUGraphAPI.Web.Controllers
     {
         private ApplicationSignInManager signInManager;
         private ApplicationUserManager userManager;
+        private CookieService cookieServie;
+        private ApplicationService applicationService;
+ 
 
-        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
+        public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager, CookieService cookieService,
+            ApplicationService applicationService)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
+            this.cookieServie = cookieService;
+            this.applicationService = applicationService;
+
         }
 
         //
@@ -33,6 +46,7 @@ namespace EDUGraphAPI.Web.Controllers
         public ActionResult Login(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
+            cookieServie.ClearCookies();
             return View();
         }
 
@@ -260,7 +274,8 @@ namespace EDUGraphAPI.Web.Controllers
             Session["AnyName"] = "AnyValue";
 
             // Request a redirect to the external login provider
-            return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", "Account", new { ReturnUrl = returnUrl }));
+            return new ChallengeResult(provider, Url.Action("ExternalLoginCallback", "Account", 
+                new { ReturnUrl = returnUrl }));
         }
 
         //
@@ -310,7 +325,11 @@ namespace EDUGraphAPI.Web.Controllers
                 var authResult = await AuthenticationManager.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationType);
                 loginInfo = GetExternalLoginInfo(authResult);
             }
-
+            var userContext = await applicationService.GetUserContextAsync();
+            if (userContext != null && userContext.User != null)
+            {
+                SetCookiesForO365User(userContext.User.FullName, userContext.User.Email);
+            }
             return RedirectToLocal(returnUrl);
 
             //// Sign in the user with this external login provider if the user already has a login
@@ -376,10 +395,13 @@ namespace EDUGraphAPI.Web.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult LogOff()
         {
+            string email = cookieServie.GetCookiesOfEmail();
+            string username = cookieServie.GetCookiesOfUsername();
             AuthenticationManager.SignOut(
                 DefaultAuthenticationTypes.ApplicationCookie,
                 OpenIdConnectAuthenticationDefaults.AuthenticationType,
                 CookieAuthenticationDefaults.AuthenticationType);
+            SetCookiesForO365User(username, email);
             return RedirectToAction("Index", "Home");
         }
 
@@ -410,7 +432,32 @@ namespace EDUGraphAPI.Web.Controllers
             };
         }
 
+        [AllowAnonymous]
+        public ActionResult O365login()
+        {
+            string username = cookieServie.GetCookiesOfUsername();
+            string email = cookieServie.GetCookiesOfEmail();
+            if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(email))
+            {
+                TempData["username"] = username;
+                TempData["email"] = email;
+            }
+            else
+                RedirectToAction("Login","Account");
+            return View();
+        }
+        private void SetCookiesForO365User(string username, string email)
+        {
 
+            Response.Cookies.Add(new HttpCookie(Constants.UsernameCookie, username)
+            {
+                Expires = DateTime.UtcNow.AddDays(30) 
+            });
+            Response.Cookies.Add(new HttpCookie(Constants.EmailCookie, email)
+            {
+                Expires = DateTime.UtcNow.AddDays(30)
+            });
+        }
         #region Helpers
         // Used for XSRF protection when adding external logins
         private const string XsrfKey = "XsrfId";

@@ -1,7 +1,11 @@
-﻿@model EDUGraphAPI.Web.Models.ExternalLoginListViewModel
+﻿@*
+    *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
+    *   * See LICENSE in the project root for license information.
+*@
+@model EDUGraphAPI.Web.Models.ExternalLoginListViewModel
 @using Microsoft.Owin.Security
 
-<h4 class="margin-btm-20">Use your work or school, or personal Microsoft account.</h4>
+<h4 class="margin-btm-20">Use your school account</h4>
 @{
     var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes();
     if (loginProviders.Count() == 0) {

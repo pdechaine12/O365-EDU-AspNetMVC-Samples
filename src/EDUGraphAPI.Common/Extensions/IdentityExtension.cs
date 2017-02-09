@@ -1,4 +1,8 @@
-﻿using System.Security.Claims;
+﻿/*   
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+ */
+using System.Security.Claims;
 using System.Security.Principal;
 using Microsoft.AspNet.Identity;
 

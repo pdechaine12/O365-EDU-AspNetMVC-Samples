@@ -1,4 +1,8 @@
-﻿@font-face {
+﻿/*   
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+ */
+@font-face {
   font-family: 'Helvetica Neue LT Std Light';
   src: url("../fonts/HelveticaNeueLTStd-Light.eot"); /* IE9 Compat Modes */
   src: url("../fonts/HelveticaNeueLTStd-Light.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
@@ -189,7 +193,7 @@ textarea {
 
 .ignore{display:none;}
 .container>div.row{height:auto;background-color:#fff;}
-.container.body-content{height:auto; background-color:#fff;}
+.container.body-content{height:100%; background-color:#fff;}
 .schools{height:auto;background-color:#fff;padding:0;}
 .schools .toptiles{float:right;padding-left: 15px;}
 .hr-green{border: 0;height: 10px;margin-top: 10px;}
@@ -306,7 +310,7 @@ textarea {
 #seatingchart .greenicon{width:14px;height:14px;background:#237e17;float:left;margin:3px 6px 0 0;}
 .assignseat{margin:12px 0;}
 #lstproducts{padding-left:0;}
-#lstproducts img, .deskicon img, #studentsTable img{
+#lstproducts img, .deskicon img, #studentsTable img, .userinfo img, .aboutme img{
 border-radius: 30px;
 -webkit-border-radius: 30px;
 -moz-border-radius: 30px;
@@ -314,6 +318,7 @@ border: 1px solid #e4e4e4;
 max-width: 50px;
 height: auto;
 }
+.userinfo img, .aboutme img{max-width:36px;}
 #lstproducts li{width:100%;min-height:60px;}
 #lstproducts li *{float:left;}
 #lstproducts li .disname{

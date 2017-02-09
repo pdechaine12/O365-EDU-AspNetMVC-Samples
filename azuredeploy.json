@@ -9,19 +9,6 @@
         "description": "The name of the web client app that you wish to create."
       }
     },
-    "sqlAdministratorLoginUsername": {
-      "type": "string",
-      "defaultValue": "EDUGraphAPI",
-      "metadata": {
-        "description": "The database admin username that you wish to create."
-      }
-    },
-    "sqlAdministratorLoginPassword": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Password for database admin user that you wish to use."
-      }
-    },
     "hostingPlanName": {
       "type": "string",
       "defaultValue": "EDUGraphAPI",
@@ -76,8 +63,6 @@
     "location": "[resourceGroup().location]",
     "lowerSiteName": "[toLower(parameters('siteName'))]",
     "storageAccountName": "[variables('lowerSiteName')]",
-    "sqlServerName": "[concat(variables('lowerSiteName'), '-dbserver')]",
-    "sqlDatabaseName": "EDUGraphAPI",
     "webSiteName": "[variables('lowerSiteName')]"
   },
   "resources": [
@@ -110,49 +95,6 @@
       "location": "[variables('location')]"
     },
     {
-      "type": "Microsoft.Sql/servers",
-      "kind": "v12.0",
-      "name": "[variables('sqlServerName')]",
-      "apiVersion": "2014-04-01-preview",
-      "location": "[variables('location')]",
-      "properties": {
-        "administratorLogin": "[parameters('sqlAdministratorLoginUsername')]",
-        "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
-        "version": "12.0"
-      },
-      "resources": [
-        {
-          "type": "databases",
-          "kind": "v12.0,user",
-          "name": "[variables('sqlDatabaseName')]",
-          "apiVersion": "2014-04-01-preview",
-          "location": "[variables('location')]",
-          "properties": {
-            "edition": "Basic",
-            "maxSizeBytes": "2147483648"
-          },
-          "resources": [ ],
-          "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('sqlServerName'))]"
-          ]
-        },
-        {
-          "type": "firewallRules",
-          "kind": "v12.0",
-          "name": "AllowAllInternalIPs",
-          "apiVersion": "2014-04-01-preview",
-          "location": "[variables('location')]",
-          "properties": {
-            "startIpAddress": "0.0.0.0",
-            "endIpAddress": "0.0.0.0"
-          },
-          "dependsOn": [
-            "[resourceId('Microsoft.Sql/servers', variables('sqlServerName'))]"
-          ]
-        }
-      ]
-    },
-    {
       "type": "Microsoft.Web/sites",
       "name": "[variables('webSiteName')]",
       "apiVersion": "2015-08-01",
@@ -178,7 +120,8 @@
             "CertPath": "EduGraphAPI App Only Cert.pfx",
             "CertPassword": "J48W23RQeZv85vj",
             "SourceCodeRepositoryUrl": "[parameters('SourceCodeRepositoryUrl')]",
-            "project": "src/EDUGraphAPI.Web/EDUGraphAPI.Web.csproj"
+            "project": "src/EDUGraphAPI.Web/EDUGraphAPI.Web.csproj",
+            "BingMapKey": "[parameters('bingMapKey')]"
           }
         },
         {
@@ -186,13 +129,16 @@
           "type": "config",
           "name": "connectionstrings",
           "dependsOn": [
-            "[concat('Microsoft.Web/sites/', variables('webSiteName'))]",
-            "[resourceId('Microsoft.Sql/servers/', variables('sqlServerName'))]"
+            "[concat('Microsoft.Web/sites/', variables('webSiteName'))]"
           ],
           "properties": {
             "DefaultConnection": {
-              "value": "[concat('Server=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Database=', variables('sqlDatabaseName'), ';User Id=', parameters('sqlAdministratorLoginUsername'), '@', variables('sqlServerName'), ';Password=', parameters('sqlAdministratorLoginPassword'), ';')]",
-              "type": "SQLAzure"
+              "value": "Data Source=|DataDirectory|EDUGraphAPI.sdf",
+              "type": "Custom"
+            },
+            "SyncDataWebJobDefaultConnection": {
+              "value": "Data Source=D:\\home\\site\\wwwroot\\App_Data\\EDUGraphAPI.sdf",
+              "type": "Custom"
             },
             "AzureWebJobsStorage": {
               "value": "[concat('DefaultEndpointsProtocol=https;AccountName=',variables('storageAccountName'),';AccountKey=',listkeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2015-05-01-preview').key1,';')]",

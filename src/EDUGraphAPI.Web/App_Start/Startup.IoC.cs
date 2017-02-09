@@ -1,4 +1,8 @@
-﻿using Autofac;
+﻿/*   
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+ */
+using Autofac;
 using Autofac.Integration.Mvc;
 using EDUGraphAPI.Data;
 using EDUGraphAPI.Web.Controllers;
@@ -31,6 +35,7 @@ namespace EDUGraphAPI.Web
             builder.RegisterType<ApplicationService>().AsSelf().InstancePerRequest();
             builder.RegisterType<SchoolsService>().AsSelf().InstancePerRequest();
             builder.RegisterType<DemoHelperService>().AsSelf().InstancePerRequest();
+            builder.RegisterType<CookieService>().AsSelf().InstancePerRequest();
 
             // The following types are registered in Startup.Auth.Identity.cs
             // app.CreatePerOwinContext(ApplicationDbContext.Create);

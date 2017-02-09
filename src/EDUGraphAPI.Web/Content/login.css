@@ -1,4 +1,8 @@
-﻿.containerbg{height:100%;}
+﻿/*   
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+ */
+.containerbg{height:100%;}
 .body-content{background-image:url('/Images/longin-bg.jpg') ; background-size:cover; margin:0;width:100%;}
 .container>div.row{background-color:transparent;}
 .loginbody{margin:auto;padding:110px 15px 0 15px;max-width:1200px;}
@@ -24,3 +28,9 @@ input::-webkit-input-placeholder, input::-moz-placeholder, input:-ms-input-place
 .logincontrol{width:380px !important;height:36px;max-width:380px;}
 .loginbody .row .col-md-5:nth-child(2){margin-left:85px;}
 .loginbody .row .col-md-5:nth-child(1){margin-left:65px;}
+
+/*Below is for login with o365 page*/
+.logino365 .headertext{text-align:center;margin:60px 0 0 0;font-size:26px;}
+.logino365 .bodytext, .logino365 .link,.logino365 .formstyle{text-align:center;margin:20px 0 0 0;font-size:16px;}
+.logino365 .link a{color:#4B67F8;}
+.logino365 .formstyle button{background-image:url('/Images/SignInButton.png');width:106px;}

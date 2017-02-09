@@ -1,4 +1,8 @@
-﻿using EDUGraphAPI.Utils;
+﻿/*   
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+ */
+using EDUGraphAPI.Utils;
 using EDUGraphAPI.Web.Infrastructure;
 using EDUGraphAPI.Web.Services;
 using EDUGraphAPI.Web.Services.GraphClients;
@@ -15,6 +19,7 @@ namespace EDUGraphAPI.Web.Controllers
     public class AdminController : Controller
     {
         static readonly string StateKey = typeof(AdminController).Name + "State";
+        static readonly string AdminConsentRedirectUrlKey = typeof(AdminController).Name + "AdminConsentRedirectUrl";
 
         private ApplicationService applicationService;
 
@@ -28,13 +33,23 @@ namespace EDUGraphAPI.Web.Controllers
         public async Task<ActionResult> Index()
         {
             var adminContext = await applicationService.GetAdminContextAsync();
+            TempData[AdminConsentRedirectUrlKey] = Url.Action("Index");
             return View(adminContext);
         }
 
         //
-        // POST: /Admin/Consent
-        [HttpPost, ValidateAntiForgeryToken]
+        // GET: /Admin/Consent
+        [AllowAnonymous]
         public ActionResult Consent()
+        {
+            TempData[AdminConsentRedirectUrlKey] = Url.Action("Consent");
+            return View();
+        }
+
+        //
+        // POST: /Admin/Consent
+        [AllowAnonymous, HttpPost, ValidateAntiForgeryToken, ActionName("Consent")]
+        public ActionResult ConsentPost()
         {
             // generate a random value to identify the request
             var stateMarker = Guid.NewGuid().ToString();
@@ -42,8 +57,8 @@ namespace EDUGraphAPI.Web.Controllers
 
             //create an OAuth2 request, using the web app as the client.
             //this will trigger a consent flow that will provision the app in the target tenant
-            var redirectUrl = Request.Url.GetLeftPart(UriPartial.Authority) + "/Admin/ProcessCode";
-            var authorizationUrl = AuthorizationHelper.GetUrl(redirectUrl, stateMarker, Constants.Resources.AADGraph, AuthorizationHelper.Prompt.AdminConsent);
+            var url = Request.Url.GetLeftPart(UriPartial.Authority) + "/Admin/ProcessCode";
+            var authorizationUrl = AuthorizationHelper.GetUrl(url, stateMarker, Constants.Resources.AADGraph, AuthorizationHelper.Prompt.AdminConsent);
 
             // send the admin to consent
             return new RedirectResult(authorizationUrl);
@@ -51,12 +66,14 @@ namespace EDUGraphAPI.Web.Controllers
 
         //
         // GET: /Admin/ProcessCode
+        [AllowAnonymous]
         public async Task<ActionResult> ProcessCode(string code, string error, string error_description, string resource, string state)
         {
+            var redirectUrl = (TempData[AdminConsentRedirectUrlKey] as string) ?? Url.Action("Index");
             if (TempData[StateKey] as string != state)
             {
                 TempData["Error"] = "Invalid operation. Please try again";
-                return RedirectToAction("Index");
+                return Redirect(redirectUrl);
             }
 
             // Get the tenant
@@ -69,7 +86,8 @@ namespace EDUGraphAPI.Web.Controllers
             await applicationService.CreateOrUpdateOrganizationAsync(tenant, true);
 
             TempData["Message"] = "Admin consented successfully!";
-            return RedirectToAction("Index");
+            redirectUrl += (redirectUrl.Contains("?") ? "&" : "?") + "consented=true";
+            return Redirect(redirectUrl);
         }
 
         //

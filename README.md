@@ -1,8 +1,23 @@
-# EDUGraphAPI - Office 365 Education Code Sample#
+# EDUGraphAPI - Office 365 Education Code Sample
 
-## What is EDUGraphAPI?##
+O365 for Education tenants offer schools 
+In this sample we show you how to integrate with school roles/roster data as well as O365 services available via the Graph API. 
 
-EDUGraphAPI  is a sample that demonstrates:
+School data is kept in sync in O365 Education tenants by [Microsoft School Data Sync](http://sds.microsoft.com).  
+
+**Table of contents**
+* [Sample Goals](#summary)
+* [Prerequisites](#prereqs)
+* [Register the application](#register)
+* [Build and debug locally](#build)
+* [Deploy the sample to Azure](#deploy)
+* [Understand the code](#understand)
+* [Questions and comments](#questions)
+* [Contributing](#contribute)
+
+## Sample Goals
+
+The sample demonstrates:
 
 * Calling Graph APIs, including:
 
@@ -18,13 +33,152 @@ EDUGraphAPI  is a sample that demonstrates:
   * [Office 365 Schools REST API reference](https://msdn.microsoft.com/office/office365/api/school-rest-operations)
   * A [Differential Query](https://msdn.microsoft.com/en-us/library/azure/ad/graph/howto/azure-ad-graph-api-differential-query) is used to sync data that is cached in a local database by the SyncData Web Job.
 
-EDUGraphAPI is based on ASP.NET MVC. [ASP.NET Identity](https://www.asp.net/identity) is used in this project.
+EDUGraphAPI is based on ASP.NET MVC and [ASP.NET Identity](https://www.asp.net/identity) is also used in this project.
 
-## How To: Configure your Development Environment
+## Prerequisites
+
+**Deploying and running this sample requires**:
+* An Azure subscription with permissions to register a new application, and deploy the web app and SQL Server database
+* An O365 Education tenant with Microsoft School Data Sync enabled
+    * One of the following browsers: Edge, Internet Explorer 9, Safari 5.0.6, Firefox 5, Chrome 13, or a later version of one of these browsers.
+      Additionally: Developing/running this sample locally requires the following:  
+    * Visual Studio 2015 (any edition), [Visual Studio 2015 Community](https://go.microsoft.com/fwlink/?LinkId=691978&clcid=0x409) is available for free.
+    * Familiarity with C#, .NET Web applications, JavaScript programming and web services.
+
+**Optional configuration**:
+
+A feature in this sample demonstrates calling the Bing Maps API which requires a key to enable the Bing Maps feature. 
+
+Create a key to enable Bing Maps API features in the app:
+
+1. Open [https://www.bingmapsportal.com/](https://www.bingmapsportal.com/) in your web browser and sign in.
+
+2. Click  **My account** -> **My keys**.
+
+3. Create a **Basic** key, select **Public website** as the application type.
+
+4. Copy the **Key** and save it. 
+
+   ![](Images/bing-maps-key.png)
+
+   > **Note:** The key is used in the app configuration steps for debug and deploy.
+
+## Register the application in Azure Active Directory
+
+1. Sign into the new azure portal: [https://portal.azure.com/](https://portal.azure.com/).
+
+2. Choose your Azure AD tenant by selecting your account in the top right corner of the page:
+
+   ![](Images/aad-select-directory.png)
+
+3. Click **Azure Active Directory** -> **App registrations** -> **+Add**.
+
+   ![](Images/aad-create-app-01.png)
+
+4. Input a **Name**, and select **Web app / API** as **Application Type**.
+
+   Input **Sign-on URL**: https://localhost:44311/
+
+   ![](Images/aad-create-app-02.png)
+
+   Click **Create**.
+
+5. Once completed, the app will show in the list.
+
+   ![](/Images/aad-create-app-03.png)
+
+6. Click it to view its details. 
+
+   ![](/Images/aad-create-app-04.png)
+
+7. Click **All settings**, if the setting window did not show.
+
+   * Click **Properties**, then set **Multi-tenanted** to **Yes**.
+
+     ![](/Images/aad-create-app-05.png)
+
+     Copy aside **Application ID**, then Click **Save**.
+
+   * Click **Required permissions**. Add the following permissions:
+
+     | API                            | Application Permissions       | Delegated Permissions                    |
+     | ------------------------------ | ----------------------------- | ---------------------------------------- |
+     | Microsoft Graph                | Read all users' full profiles | Read all groups<br>Read directory data<br>Access directory as the signed in user<br>Sign users in |
+     | Windows Azure Active Directory |                               | Sign in and read user profile<br>Read and write directory data |
+
+     ![](/Images/aad-create-app-06.png)
+
+   * Click **Keys**, then add a new key:
+
+     ![](Images/aad-create-app-07.png)
+
+     Click **Save**, then copy aside the **VALUE** of the key. 
+
+   Close the Settings window.
+
+8. Click **Manifest**.
+
+   ![](Images/aad-create-app-08.png)
+
+   Insert the following JSON to the array of **keyCredentials**.
+
+   ~~~json
+       {
+         "customKeyIdentifier": "nNWUyxhgK5zcg7pPj8UFo1xFM9Y=",
+         "keyId": "fec5af6a-1cc8-45ec-829f-95999e623b2d",
+         "type": "AsymmetricX509Cert",
+         "usage": "Verify",
+         "value": "MIIDIzCCAg+gAwIBAgIQUWcl+kIoiZxPK2tT8v05WzAJBgUrDgMCHQUAMCQxIjAgBgNVBAMTGUVkdUdyYXBoQVBJIEFwcCBPbmx5IENlcnQwHhcNMTYxMDMxMTYwMDAwWhcNMzYxMDMwMTYwMDAwWjAkMSIwIAYDVQQDExlFZHVHcmFwaEFQSSBBcHAgT25seSBDZXJ0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwND0Wclbty/5UYwsrjAvSFaw8JOi33lXP1QI4qecOH4HXvrhz4L5ZN8thG6L/nSIcocuELNbDfJhLehBzxKwtvq9tO0o3MpFK0aloQS5JmoAstMns427osG8DpfnaqwiFyMv558fUHSEkx8GSU/IQgZ6IoSLahTSGCy0LRFHKIyZ6Xo0z9zYN07eQO53obakNlF6YzUg+2v6jLmKnmSXbog+46F9yVvTK2/4MLdPy7lKO2lycec+mljlBWJF4shLacaVrdtQZtanY0zN+XlM48mUVSToNz18tGX/cW9PT5WqIO/O5liEnz9O5u4NTBUUYDqiSuxA4yHV63A+zxhwPwIDAQABo1kwVzBVBgNVHQEETjBMgBAUkYVZ6pBIdTnoV4pmTRzwoSYwJDEiMCAGA1UEAxMZRWR1R3JhcGhBUEkgQXBwIE9ubHkgQ2VydIIQUWcl+kIoiZxPK2tT8v05WzAJBgUrDgMCHQUAA4IBAQBwRDrFpLRYGFARs20Ez+sK6ACrtFbVC5tAnFxr97FWTbixXFm1GPC/pmSnYsiRtiLMliX1+QmTIT80OFk2rfnv3EjY2uCF0XWXH7oRonUFpScA2rQ0geEPRVDXHQ9TJcdEX6+QD6/hAFyANUkWb9uHT1srIxUHerwPCmprOfSCqLVkYXZgvnvWC9XeJP4KriftiqNkfr2FIjqvWrkUMn7iHBHRMW42gfsHoX9LmRLjoqnm1YEyS/t2tibL3FAsJvWv0T03JDCwePF13oItzV0lp0jJDz+xahz8aG3gkacmjzliBeXWWEo9VfxOGLsHjonj3lRSsQLfOn5k3e6lxsJG"
+       }
+   ~~~
+
+   ![](Images/aad-create-app-09.png)
+
+   Click **Save**.
+
+   > Note: this step configure the certification used by a Web Job. Check **Application Authentication Flow** section for more details.
+
+## Build and debug locally
 
 This project can be opened with the edition of Visual Studion 2015 you already have, or download and install the the Community edition to run, build and/or develop this application locally.
 
 - [Visual Studio 2015 Community](https://go.microsoft.com/fwlink/?LinkId=691978&clcid=0x409)
+
+Open and Debug the sample locally
+
+1. Debug the **EDUGraphAPI.Web**:
+
+   Configure the **Web.config**. 
+
+   ![](Images/web-app-config.png)
+
+   * **Connection Strings**: 
+     * **DefaultConnection**: you may create a local SQL Server database or use the one created in the Azure.
+   * **App Settings**: 
+     * **BingMapKey**: use the key of Bing Map you got earlier. This setting is optional.
+     * **ida:ClientId**: use the Client Id of the app registration your created earlier.
+     * **ida:ClientSecret**: use the Key value of the app registration your created earlier.
+     * **SourceCodeRepositoryURL**: use the repository URL of your fork.
+
+   Set **EDUGraphAPI.Web** as StartUp project, and press F5. 
+
+2. Debug the **EDUGraphAPI.SyncData**:
+
+   Configure the **App.config**:
+
+   ![](Images/webjob-app-config.png)
+
+   * **Connection Strings**:
+     * **AzureWebJobsDashboard**: create a new storage account and use its connection string.
+     * **AzureWebJobsStorage**: use the same connection string as **AzureWebJobsDashboard**.
+     * **DefaultConnection**: use the same connection string used above for the Web.config.
+   * **App Settings**:
+     * **ida:ClientId**: use the Client Id of the app registration your created earlier.
+
+   Set **EDUGraphAPI.SyncData** as StartUp project, and press F5. 
+
+
+## Deploy the sample to Azure
 
 **GitHub Authorization**
 
@@ -35,8 +189,8 @@ This project can be opened with the edition of Visual Studion 2015 you already h
    - Click **Generate Token**
    - Enter a value in the **Token description** text box
    - Select the following s (your selections should match the screenshot below):
-         - repo (all) -> repo:status, repo_deployment, public_repo
-         - admin:repo_hook -> read:repo_hook
+        - repo (all) -> repo:status, repo_deployment, public_repo
+        - admin:repo_hook -> read:repo_hook
 
    ![](Images/github-new-personal-access-token.png)
 
@@ -56,82 +210,7 @@ This project can be opened with the edition of Visual Studion 2015 you already h
 
    - Click **PUT**
 
-**Create a key to use the Bing Maps**
-
-1. Open [https://www.bingmapsportal.com/](https://www.bingmapsportal.com/) in your web browser and sign in.
-
-2. Click  **My account** -> **My keys**.
-
-3. Create a **Basic** key, select **Public website** as the application type.
-
-4. Copy the **Key** and save it. 
-
-   ![](Images/bing-maps-key.png)
-
-   >**Note:** The key is used in a subsequent step.
-
-**Create an Application in you AAD**
-
-1. Sign into the traditional azure portal: [https://manage.windowsazure.com](https://manage.windowsazure.com).
-
-2. Open the AAD where you plan to create the application.
-
-3. Click **ADD** on the bottom bar.
-
-   ![](Images/aad-applications.png)
-
-4. Click **Add an application my organization is developing**.
-
-   ![](Images/aad-create-app-01.png)
-
-5. Input a **Name**, and select **WEB APPLICATION AND/OR WEB API**. 
-
-   ![](Images/aad-create-app-02.png)
-
-6. Click **➔**.
-
-
-7. Enter the following values:
-
-   * **SIGN-ON URL:** https://localhost:44311/
-
-   * **APP ID URI:** https://<<YOUR TENANT>>/EDUGraphAPI
-
-   >**Note**: A domain from your tenant must be used here, since this is a multi-tenant application.
-
-   ![](Images/aad-create-app-03.png)
-
-8. Click the **✓**.
-
-9. Click **CONFIGURE**.
-
-   ![](Images/aad-configure-app-01.png)
-
-10. Enable **APPLICATION IS MULTI-TENANT**.
-
-   ![](Images/aad-configure-app-02.png)
-
-11. [Optional] Enable **USER ASSIGNMENT REQUIRED TO ACCESS APP**.
-
-   ![](Images/aad-configure-app-05.png)
-
-12. Configure the following **permissions to other applications**.
-
-|                                | Application Permissions       | Delegated Permissions                    |
-| ------------------------------ | ----------------------------- | ---------------------------------------- |
-| Windows Azure Active Directory | Read and write directory data | Sign in and read user profile<br>Read and write directory data |
-| Microsoft Graph                | Read all users' full profiles | Read all groups<br>Read directory data<br>Access directory as the signed in user<br>Sign users in |
-
-12. In the keys section, click the dropdown list and select a duration, then click **Save**.
-
-   ![](Images/aad-configure-app-03.png)
-
-13. Copy aside the Client ID and the key value.
-
-   ![](Images/aad-configure-app-04.png)
-
-
-**Deploy the Azure Components**
+**Deploy the Azure Components from GitHub**
 
 1. Check to ensure that the build is passing VSTS Build
 
@@ -163,17 +242,17 @@ This project can be opened with the edition of Visual Studion 2015 you already h
 
    * **Source Code Manual Integration**: choose **false**, since you are deploying from your own fork.
 
-   * **Client Id**: use the Client Id of the AAD Application your created earlier.
+   * **Client Id**: use the Client Id of the app registration your created earlier.
 
-   * **Client Secret**: use the Key value of the AAD Application your created earlier.
+   * **Client Secret**: use the Key value of the app registration your created earlier.
 
-   * **Bing Map Key**: use the key of Bing Map you got earlier.
+   * **Bing Map Key**: use the key of Bing Map you got earlier. This setting is optional.
 
    * Check **I agree to the terms and conditions stated above**.
 
 5. Click **Purchase**.
 
-**Add REPLY URL to the AAD Application**
+**Add REPLY URL to the app registration**
 
 1. After the deployment, open the resource group:
 
@@ -185,50 +264,17 @@ This project can be opened with the edition of Visual Studion 2015 you already h
 
    Copy the URL aside and change the schema to **https**. This is the replay URL and will be used in next step.
 
-3. Navigate to the AAD application in the traditional azure portal, then click the **Configure** tab.
+3. Navigate to the app registration in the new azure portal, then open the setting windows.
 
    Add the reply URL:
 
    ![](Images/aad-add-reply-url.png)
 
-   > Note: please also add https://localhost:44311/ then you are able to debug the sample locally.
+   > Note: to debug the sample locally, make sure that https://localhost:44311/ is in the reply URLs.
 
 4. Click **SAVE**.
 
-**Debug the sample locally**
-
-1. Debug the **EDUGraphAPI.Web**:
-
-   Configure the **Web.config**. 
-
-   ![](Images/web-app-config.png)
-
-   * **Connection Strings**: 
-     * **DefaultConnection**: you may create a local SQL Server database or use the one created in the Azure.
-   * **App Settings**: 
-     * **BingMapKey**: use the key of Bing Map you got earlier.
-     * **ida:ClientId**: use the Client Id of the AAD Application your created earlier.
-     * **ida:ClientSecret**: use the Key value of the AAD Application your created earlier.
-     * **SourceCodeRepositoryURL**: use the repository URL of your fork.
-
-   Set **EDUGraphAPI.Web** as StartUp project, and press F5. 
-
-2. Debug the **EDUGraphAPI.SyncData**:
-
-   Configure the **App.config**:
-
-   ![](Images/webjob-app-config.png)
-
-   * **Connection Strings**:
-     * **AzureWebJobsDashboard**: create a new storage account and use its connection string.
-     * **AzureWebJobsStorage**: use the same connection string as **AzureWebJobsDashboard**.
-     * **DefaultConnection**: use the same connection string used above for the Web.config.
-   * **App Settings**:
-     * **ida:ClientId**: use the Client Id of the AAD Application your created earlier.
-
-   Set **EDUGraphAPI.SyncData** as StartUp project, and press F5. 
-
-## Documentation
+## Understand the code
 
 ### Introduction
 
@@ -438,7 +484,6 @@ public async Task<UserInfo> GetCurrentUserAsync()
         Roles = await GetRolesAsync(me)
     };
 }
-
 ~~~
 
 ~~~c#
@@ -454,7 +499,7 @@ public async Task<TenantInfo> GetTenantAsync(string tenantId)
 
 ~~~
 
-Note that in AAD Application settings, permissions for each Graph API are configured separately:
+Note that in app registration settings, permissions for each Graph API are configured separately:
 
 ![](Images/aad-app-permissions.png) 
 
@@ -530,7 +575,7 @@ In **EducationServiceClient**, three private methods prefixed with HttpGet were 
 
 ### Differential Query
 
-[A differential query](https://msdn.microsoft.com/en-us/Library/Azure/Ad/Graph/howto/azure-ad-graph-api-differential-query) request returns all changes made to specified entities during the time between two consecutive requests. For example, if you make a differential query request an hour after the previous differential query request, only the changes made during that hour will be returned. This functionality is especially useful when synchronizing tenant directory data with an application’s data store.
+A [differential query](https://msdn.microsoft.com/en-us/Library/Azure/Ad/Graph/howto/azure-ad-graph-api-differential-query) request returns all changes made to specified entities during the time between two consecutive requests. For example, if you make a differential query request an hour after the previous differential query request, only the changes made during that hour will be returned. This functionality is especially useful when synchronizing tenant directory data with an application’s data store.
 
 The related code is in the following two folders of the **EDUGraphAPI.Common** project:
 

@@ -1,4 +1,8 @@
-﻿using EDUGraphAPI.Data;
+﻿/*   
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+ */
+using EDUGraphAPI.Data;
 using EDUGraphAPI.Utils;
 using EDUGraphAPI.Web.Infrastructure;
 using EDUGraphAPI.Web.Models;
@@ -20,16 +24,21 @@ namespace EDUGraphAPI.Web.Controllers
     public class LinkController : Controller
     {
         static readonly string StateKey = typeof(LinkController).Name + "State";
+        static readonly string UsernameCookie = Constants.UsernameCookie;
+        static readonly string EmailCookie = Constants.EmailCookie;
 
         private ApplicationService applicationService;
         private ApplicationSignInManager signInManager;
         private ApplicationUserManager userManager;
+        private CookieService cookieServie;
 
-        public LinkController(ApplicationService applicationService, ApplicationUserManager userManager, ApplicationSignInManager signInManager)
+        public LinkController(ApplicationService applicationService, ApplicationUserManager userManager, 
+            ApplicationSignInManager signInManager,CookieService cookieServie)
         {
             this.applicationService = applicationService;
             this.userManager = userManager;
             this.signInManager = signInManager;
+            this.cookieServie = cookieServie;
         }
 
         //
@@ -97,16 +106,39 @@ namespace EDUGraphAPI.Web.Controllers
 
             TempData["Message"] = Resources.LinkO365AccountSuccess;
             TempData[HandleAdalExceptionAttribute.ChallengeImmediatelyTempDataKey] = true;
+            SetCookiesForO365User(user.GivenName + " " + user.Surname, user.UserPrincipalName);
+
             return RedirectToAction("Index", "Home");
         }
 
         //
         // GET: /Link/LoginLocal
-        public ActionResult LoginLocal()
+        public async Task<ActionResult> LoginLocal(LoginViewModel model)
         {
-            return View();
-        }
+            var activeDirectoryClient = await AuthenticationHelper.GetActiveDirectoryClientAsync();
+            IGraphClient graphClient = new AADGraphClient(activeDirectoryClient);
+            var user = await graphClient.GetCurrentUserAsync();
+            var localUser = userManager.FindByEmail(user.Mail);
+            if (localUser == null)
+            {
+                return View();
+            }
+            var tenantId = User.GetTenantId();            
+            if (localUser.O365UserId.IsNotNullAndEmpty())
+            {
+                ModelState.AddModelError("Email", "The local account has already been linked to another Office 365 account.");
+                return View(model);
+            }
 
+            var tenant = await graphClient.GetTenantAsync(tenantId);
+
+            await applicationService.UpdateLocalUserAsync(localUser, user, tenant);
+            SetCookiesForO365User(user.GivenName + " " + user.Surname, user.Mail);
+            TempData["Message"] = Resources.LinkO365AccountSuccess;
+            TempData[HandleAdalExceptionAttribute.ChallengeImmediatelyTempDataKey] = true;
+
+            return RedirectToAction("Index", "Schools");
+        }
         //
         // POST: /Link/LoginLocalPost
         [HttpPost, ActionName("LoginLocal"), ValidateAntiForgeryToken]
@@ -139,9 +171,12 @@ namespace EDUGraphAPI.Web.Controllers
             var tenant = await graphClient.GetTenantAsync(tenantId);
 
             await applicationService.UpdateLocalUserAsync(localUser, user, tenant);
+            SetCookiesForO365User(user.GivenName + " " + user.Surname, user.Mail);
 
             return RedirectToAction("Index", "Schools");
         }
+
+
 
         //
         // GET: /Link/CreateLocalAccount
@@ -175,7 +210,7 @@ namespace EDUGraphAPI.Web.Controllers
 
             model.Email = user.Mail ?? user.UserPrincipalName;
             model.FavoriteColors = Constants.FavoriteColors;
-            if (!ModelState.IsValid) return View(model);
+            //if (!ModelState.IsValid) return View(model);
 
             // Create a new local user
             var localUser = new ApplicationUser
@@ -184,7 +219,7 @@ namespace EDUGraphAPI.Web.Controllers
                 UserName = model.Email,
                 FavoriteColor = model.FavoriteColor
             };
-            var result = await userManager.CreateAsync(localUser, model.Password);
+            var result = await userManager.CreateAsync(localUser);
             if (!result.Succeeded)
             {
                 AddErrors(result);
@@ -193,7 +228,7 @@ namespace EDUGraphAPI.Web.Controllers
 
             // Update the local user
             await applicationService.UpdateLocalUserAsync(localUser, user, tenant);
-
+            SetCookiesForO365User(user.GivenName + " " + user.Surname, user.Mail);
             return RedirectToAction("Index", "Schools");
         }
 
@@ -221,6 +256,19 @@ namespace EDUGraphAPI.Web.Controllers
             {
                 ModelState.AddModelError("", error);
             }
+        }
+
+        private void SetCookiesForO365User(string username, string email)
+        {
+
+            Response.Cookies.Add(new HttpCookie(Constants.UsernameCookie, username)
+            {
+                Expires = DateTime.UtcNow.AddDays(30)
+            });
+            Response.Cookies.Add(new HttpCookie(Constants.EmailCookie, email)
+            {
+                Expires = DateTime.UtcNow.AddDays(30)
+            });
         }
     }
 }
