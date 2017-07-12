@@ -154,7 +154,7 @@ namespace EDUGraphAPI.Web.Services
             foreach (var user in section.Students)
             {
                 var seat= dbContext.ClassroomSeatingArrangements.Where(c => c.O365UserId == user.O365UserId && c.ClassId==classId).FirstOrDefault();
-                user.Position = (seat == null ? 0 : seat.Position);
+                user.Position = seat?.Position ?? 0;
             }
             return new SectionDetailsViewModel
             {

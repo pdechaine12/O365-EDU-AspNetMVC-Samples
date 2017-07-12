@@ -108,5 +108,18 @@ namespace EDUGraphAPI.Models
                 db.SaveChanges();
             }
         }
+
+        public static void ClearUserTokenCache()
+        {
+            using (var db = new ApplicationDbContext())
+            {
+                var cacheEntries = db.UserTokenCacheList
+                    .ToArray();
+                db.UserTokenCacheList.RemoveRange(cacheEntries);
+                db.SaveChanges();
+            }
+        }
+
+
     }
 }
