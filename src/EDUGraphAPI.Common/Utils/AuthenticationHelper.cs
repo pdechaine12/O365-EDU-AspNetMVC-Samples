@@ -121,7 +121,7 @@ namespace EDUGraphAPI.Utils
             var signedInUserID = permissions == Permissions.Delegated ? userId : tenantID;
 
             var authority = string.Format("{0}{1}", Constants.AADInstance, tenantID);
-            var tokenCache = new ADALTokenCache(signedInUserID);
+            var tokenCache = new AdalTokenCache(signedInUserID);
             return new AuthenticationContext(authority, tokenCache);
         }
 
