@@ -103,8 +103,8 @@
                     </div>
                 </td>   
                 <td>
-                    @Html.ActionLink("Classes", "Classes", null, new { schoolId = school.ObjectId }, new { @class = "btnlink" })
-                    @Html.ActionLink("Teachers/students", "Users", null, new { schoolId = school.ObjectId }, new { @class = "btnlink" })
+                    @Html.ActionLink("Classes", "Classes", null, new { schoolId = school.Id }, new { @class = "btnlink" })
+                    @Html.ActionLink("Teachers/students", "Users", null, new { schoolId = school.Id }, new { @class = "btnlink" })
                 </td>
             </tr>
             }

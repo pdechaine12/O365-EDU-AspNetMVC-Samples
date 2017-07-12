@@ -7,11 +7,8 @@ namespace Microsoft.Education.Data
         [JsonProperty("extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId")]
         public string SchoolId { get; set; }
 
-        [JsonProperty("objectId")]
-        public string ObjectId { get; set; }
-
-        [JsonProperty("objectType")]
-        public string ObjectType { get; set; }
+        [JsonProperty("id")]
+        public string Id { get; set; }
 
         [JsonProperty("displayName")]
         public string Name { get; set; }

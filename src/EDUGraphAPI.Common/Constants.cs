@@ -12,32 +12,31 @@ namespace EDUGraphAPI
         public static readonly string AADClientId = ConfigurationManager.AppSettings["ida:ClientId"];
         public static readonly string AADClientSecret = ConfigurationManager.AppSettings["ida:ClientSecret"];
 
-        public static readonly string AADInstance = "https://login.microsoftonline.com/";
-        public static readonly string Authority = AADInstance + "common/";
-
-        public const string GraphResourceRootUrl = "https://graph.windows.net";
+        public const string AADInstance = "https://login.microsoftonline.com/";
+        public const string Authority = AADInstance + "common/";
 
         public static readonly string BingMapKey = ConfigurationManager.AppSettings["BingMapKey"];
 
         public static readonly string SourceCodeRepositoryUrl = ConfigurationManager.AppSettings["SourceCodeRepositoryUrl"];
         
-        public static readonly string O365GroupConversationsUrl = "https://outlook.office.com/owa/?path=/group/{0}/mail&exsvurl=1&ispopout=0";
+        public const string O365GroupConversationsUrl = "https://outlook.office.com/owa/?path=/group/{0}/mail&exsvurl=1&ispopout=0";
 
-        public static readonly string AADCompanyAdminRoleName = "Company Administrator";
+        public const string AADCompanyAdminRoleName = "Company Administrator";
 
         public static readonly List<ColorEntity> FavoriteColors = new List<ColorEntity>() { new ColorEntity() { DisplayName= "Blue",Value= "#2F19FF" }, new ColorEntity() { DisplayName = "Green", Value = "#127605" }, new ColorEntity() { DisplayName = "Grey", Value = "#535353" } };
 
         public static class Resources
         {
-            public static readonly string AADGraph = "https://graph.windows.net";
-            public static readonly string MSGraph = "https://graph.microsoft.com";
+            public const string AADGraph = "https://graph.windows.net";
+            public const string MSGraph = "https://graph.microsoft.com";
+            public const string MSGraphVersion = "beta";
         }
 
         public static class Roles
         {
-            public static readonly string Admin = "Admin";
-            public static readonly string Faculty = "Faculty";
-            public static readonly string Student = "Student";
+            public const string Admin = "Admin";
+            public const string Faculty = "Faculty";
+            public const string Student = "Student";
         }
 
         public static class O365ProductLicenses
