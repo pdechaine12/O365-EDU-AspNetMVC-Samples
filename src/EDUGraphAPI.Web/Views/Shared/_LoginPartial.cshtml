@@ -1,10 +1,33 @@
-﻿@if (Request.IsAuthenticated)
+﻿@*
+    *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
+    *   * See LICENSE in the project root for license information.
+*@
+@if (Request.IsAuthenticated)
 {
     using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
     {
+        string displayRole = "";
+        if (User.IsInRole(Constants.Roles.Admin))
+        {
+            displayRole = "Admin.";
+        }else if (User.IsInRole(Constants.Roles.Faculty))
+        {
+            displayRole = "Teacher.";
+        } else if (User.IsInRole(Constants.Roles.Student))
+        {
+            displayRole = "Student.";
+        }
+
+        var aadUserId = User.GetObjectIdentifier();
+        string userPhoto = "";
+        if (!string.IsNullOrEmpty(aadUserId))
+        {
+            userPhoto =string.Format( "<img src='/Photo/UserPhoto/{0}'/>",aadUserId);
+        }
+
         @Html.AntiForgeryToken()
         <div class="userinfo">
-            <a href="javascript:void(0);" id="userinfolink">Hello @User.Identity.GetFullName()!</a>
+            <a href="javascript:void(0);" id="userinfolink">Logged in as: @displayRole Hello @User.Identity.GetFullName() @Html.Raw(userPhoto)</a>
             <span class="caret" id="caret"></span>
         </div>
 

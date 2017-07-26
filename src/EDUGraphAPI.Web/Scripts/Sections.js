@@ -1,4 +1,8 @@
-﻿$(document).ready(function () {
+﻿/*   
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+ */
+$(document).ready(function () {
     function bindShowDetail(tiles) {
         tiles.hover(function inFn(e) {
             $(this).children().last().show();
@@ -36,7 +40,7 @@
         tilesContainer.removeClass(tilesContainer.attr("class").replace("tiles-root-container", "")).addClass(filterType + "-container");
     });
 
-    $(".sections .allclasses-container .seemore span").click(function () {
+    $("#see-more  span").click(function () {
         var element = $(this);
         if (element.hasClass("disabled") || element.hasClass("nomore")) {
             return;

@@ -1,4 +1,8 @@
-﻿using EDUGraphAPI.Data;
+﻿/*   
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+ */
+using EDUGraphAPI.Data;
 using EDUGraphAPI.DifferentialQuery;
 using EDUGraphAPI.Web.Infrastructure;
 using System;
@@ -58,15 +62,14 @@ namespace EDUGraphAPI.DataSync
                 try
                 {
                     await SyncOrganizationUsersAsync(org);
+                    dbContext.SaveChanges();
+                    await WriteLogAsync($"All the changes were saved.");
                 }
                 catch (Exception ex)
                 {
                     await WriteLogAsync($"Failed to sync users of {org.Name}. Error: {ex.Message}");
                 }
             }
-
-            dbContext.SaveChanges();
-            await WriteLogAsync($"All the changes were saved.");
         }
 
         private async Task SyncOrganizationUsersAsync(Organization org)

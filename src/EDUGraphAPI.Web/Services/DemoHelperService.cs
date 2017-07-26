@@ -1,4 +1,8 @@
-﻿using EDUGraphAPI.Web.Models;
+﻿/*   
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+ */
+using EDUGraphAPI.Web.Models;
 using Newtonsoft.Json;
 using System.IO;
 using System.Linq;

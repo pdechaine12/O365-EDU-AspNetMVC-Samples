@@ -1,4 +1,8 @@
-﻿using EDUGraphAPI.Data;
+﻿/*   
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+ */
+using EDUGraphAPI.Data;
 using EDUGraphAPI.DataSync;
 using EDUGraphAPI.Utils;
 using Microsoft.Azure.WebJobs;
@@ -15,7 +19,7 @@ namespace EDUGraphAPI.SyncData
 
         public async static Task SyncUsersAsync([TimerTrigger("0 * * * * *")] TimerInfo timerInfo, TextWriter log)
         {
-            var dbContext = new ApplicationDbContext();
+            var dbContext = new ApplicationDbContext("SyncDataWebJobDefaultConnection");
             var userSyncService = new UserSyncService(dbContext, GetTenantAccessTokenAsync, log);
             await userSyncService.SyncAsync();
         }

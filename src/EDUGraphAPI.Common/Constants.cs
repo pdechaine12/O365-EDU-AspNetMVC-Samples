@@ -1,4 +1,8 @@
-﻿using System;
+﻿/*   
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+ */
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 
@@ -22,6 +26,8 @@ namespace EDUGraphAPI
         public const string AADCompanyAdminRoleName = "Company Administrator";
 
         public static readonly List<ColorEntity> FavoriteColors = new List<ColorEntity>() { new ColorEntity() { DisplayName= "Blue",Value= "#2F19FF" }, new ColorEntity() { DisplayName = "Green", Value = "#127605" }, new ColorEntity() { DisplayName = "Grey", Value = "#535353" } };
+        public static readonly string UsernameCookie = "O365CookieUsername";
+        public static readonly string EmailCookie = "O365CookieEmail";
 
         public static class Resources
         {
