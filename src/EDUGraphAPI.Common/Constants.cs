@@ -15,8 +15,6 @@ namespace EDUGraphAPI
         public const string AADInstance = "https://login.microsoftonline.com/";
         public const string Authority = AADInstance + "common/";
 
-        public static readonly string BingMapKey = ConfigurationManager.AppSettings["BingMapKey"];
-
         public static readonly string SourceCodeRepositoryUrl = ConfigurationManager.AppSettings["SourceCodeRepositoryUrl"];
         
         public const string O365GroupConversationsUrl = "https://outlook.office.com/owa/?path=/group/{0}/mail&exsvurl=1&ispopout=0";
@@ -41,10 +39,6 @@ namespace EDUGraphAPI
 
         public static class O365ProductLicenses
         {
-            /// <summary>
-            /// Microsoft Classroom Preview
-            /// </summary>
-            public static readonly Guid Classroom = new Guid("80f12768-d8d9-4e93-99a8-fa2464374d34");
             /// <summary>
             /// Office 365 Education for faculty
             /// </summary>

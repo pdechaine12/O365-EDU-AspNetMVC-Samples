@@ -37,20 +37,10 @@ namespace EDUGraphAPI.Web.Services
             var schools = (await educationServiceClient.GetSchoolsAsync())
                 .OrderBy(i => i.Name)
                 .ToArray();
-            BingMapService mapServices = new BingMapService();
             for (var i = 0; i < schools.Count(); i++)
             {
                 var address = string.Format("{0}/{1}/{2}", schools[i].State, HttpUtility.HtmlEncode(schools[i].City), HttpUtility.HtmlEncode(schools[i].Address));
-                if (!string.IsNullOrEmpty(schools[i].Address))
-                {
-                    var longitudeAndLatitude = await mapServices.GetLongitudeAndLatitudeByAddress(address);
-                    if (longitudeAndLatitude.Count() == 2)
-                    {
-                        schools[i].Latitude = longitudeAndLatitude[0].ToString();
-                        schools[i].Longitude = longitudeAndLatitude[1].ToString();
-                    }
-                }
-                else
+                if (string.IsNullOrEmpty(schools[i].Address))
                 {
                     if(string.IsNullOrEmpty(schools[i].Zip))
                         schools[i].Address = "-";
@@ -72,8 +62,7 @@ namespace EDUGraphAPI.Web.Services
                 UserId = currentUser.UserId,
                 EducationGrade = grade,
                 UserDisplayName = currentUser.DisplayName,
-                MySchoolId = currentUser.SchoolId,
-                BingMapKey = Constants.BingMapKey
+                MySchoolId = currentUser.SchoolId
             };
         }
 

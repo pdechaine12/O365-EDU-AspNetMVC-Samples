@@ -73,11 +73,9 @@
             @foreach (var school in Model.Schools)
             {
                 var style = "";
-                var bingIcon = "/images/icon-map_30x28px-BLU.png";
                 if (Model.MySchoolId == school.SchoolId)
                 {
                     style = "td-green";
-                    bingIcon = "/images/icon-map_30x28px-WHT.png";
                 }
             <tr class="tr-content @style">
                 <td >@Html.Raw(string.IsNullOrEmpty(school.Name)?"-": school.Name) </td>
@@ -95,12 +93,6 @@
                         }                        
                         @school.State @school.Zip
                     </div>
-                    <div class="schoolmap">
-                        @if (!string.IsNullOrEmpty(school.Latitude) && !string.IsNullOrEmpty(school.Longitude))
-                        {
-                            <a class="bingMapLink" lat="@school.Latitude" lon="@school.Longitude" href="javascript:void(0)"><img src="@bingIcon" /></a>
-                        }
-                    </div>
                 </td>   
                 <td>
                     @Html.ActionLink("Classes", "Classes", null, new { schoolId = school.Id }, new { @class = "btnlink" })
@@ -111,9 +103,6 @@
         </table>
 }
     </div>
-    <div id='myMap' ></div>
-    <input type="hidden" name="BingMapKey" id="BingMapKey" value="@Model.BingMapKey" />
-    <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol' async defer></script>
     @Scripts.Render("~/bundles/schools")
 }
 else
