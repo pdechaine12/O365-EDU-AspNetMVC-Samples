@@ -84,7 +84,7 @@
                         </div>
                         <div class="seemore @(string.IsNullOrEmpty(sections.NextLink) ? "hideitem" : string.Empty)" id="see-more">
                             <input id="nextlink" type="hidden" value="@sections.NextLink" />
-                            <input id="schoolid" type="hidden" value="@Model.School.ObjectId" />
+                            <input id="schoolid" type="hidden" value="@Model.School.Id" />
                             <span>See More</span>
                         </div>
                     }
@@ -121,7 +121,7 @@
 {
     if (isMine)
     {
-        <a class="mysectionlink" href="@Url.Action("ClassDetails", new { schoolId = Model.School.ObjectId, sectionId = section.ObjectId })">
+        <a class="mysectionlink" href="@Url.Action("ClassDetails", new { schoolId = Model.School.Id, sectionId = section.Id })">
             <div class="tile">
                 <h5>@(section.DisplayName)</h5>
                 <h2>@(section.CombinedCourseNumber)</h2>

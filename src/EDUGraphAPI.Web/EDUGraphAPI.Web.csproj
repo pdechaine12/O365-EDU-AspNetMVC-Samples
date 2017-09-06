@@ -332,8 +332,6 @@
     <Content Include="Images\global_pagination_next.png" />
     <Content Include="Images\global_pagination_previous.png" />
     <Content Include="Images\header-default.jpg" />
-    <Content Include="Images\icon-map_30x28px-BLU.png" />
-    <Content Include="Images\icon-map_30x28px-WHT.png" />
     <Content Include="Images\longin-bg.jpg" />
     <Content Include="Images\microsoft-icon.png" />
     <Content Include="Images\save.png" />

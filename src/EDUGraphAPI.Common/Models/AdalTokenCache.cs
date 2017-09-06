@@ -10,19 +10,19 @@ using System.Web.Security;
 
 namespace EDUGraphAPI.Models
 {
-    public class ADALTokenCache : TokenCache
+    public class AdalTokenCache : TokenCache
     {
-        private static readonly string MachinKeyProtectPurpose = "ADALCache";
+        private const string MachineKeyProtectPurpose = "ADALCache";
 
-        private string userId;
+        private readonly string userId;
 
-        public ADALTokenCache(string signedInUserId)
+        public AdalTokenCache(string signedInUserId)
         {
             this.userId = signedInUserId;
             this.AfterAccess = AfterAccessNotification;
             this.BeforeAccess = BeforeAccessNotification;
 
-            GetCahceAndDeserialize();
+            GetCacheAndDeserialize();
         }
 
         public override void Clear()
@@ -33,7 +33,7 @@ namespace EDUGraphAPI.Models
 
         void BeforeAccessNotification(TokenCacheNotificationArgs args)
         {
-            GetCahceAndDeserialize();
+            GetCacheAndDeserialize();
         }
 
         void AfterAccessNotification(TokenCacheNotificationArgs args)
@@ -46,14 +46,14 @@ namespace EDUGraphAPI.Models
         }
 
 
-        private void GetCahceAndDeserialize()
+        private void GetCacheAndDeserialize()
         {
             var cacheBits = GetUserTokenCache(userId);
             if (cacheBits != null)
             {
                 try
                 {
-                    var data = MachineKey.Unprotect(cacheBits, MachinKeyProtectPurpose);
+                    var data = MachineKey.Unprotect(cacheBits, MachineKeyProtectPurpose);
                     this.Deserialize(data);
                 }
                 catch { }
@@ -62,7 +62,7 @@ namespace EDUGraphAPI.Models
 
         private void SerializeAndUpdateCache()
         {
-            var cacheBits = MachineKey.Protect(this.Serialize(), MachinKeyProtectPurpose);
+            var cacheBits = MachineKey.Protect(this.Serialize(), MachineKeyProtectPurpose);
             UpdateUserTokenCache(userId, cacheBits);
         }
 
@@ -72,11 +72,11 @@ namespace EDUGraphAPI.Models
             using (var db = new ApplicationDbContext())
             {
                 var cache = GetUserTokenCache(db, userId);
-                return cache != null ? cache.cacheBits : null;
+                return cache?.cacheBits;
             }
         }
 
-        private void UpdateUserTokenCache(string userId, byte[] cacheBits)
+        private static void UpdateUserTokenCache(string userId, byte[] cacheBits)
         {
             using (var db = new ApplicationDbContext())
             {
@@ -94,14 +94,14 @@ namespace EDUGraphAPI.Models
             }
         }
 
-        private UserTokenCache GetUserTokenCache(ApplicationDbContext db, string userId)
+        private static UserTokenCache GetUserTokenCache(ApplicationDbContext db, string userId)
         {
             return db.UserTokenCacheList
                    .OrderByDescending(i => i.LastWrite)
                    .FirstOrDefault(c => c.webUserUniqueId == userId);
         }
 
-        private void ClearUserTokenCache(string userId)
+        private static void ClearUserTokenCache(string userId)
         {
             using (var db = new ApplicationDbContext())
             {
@@ -112,5 +112,18 @@ namespace EDUGraphAPI.Models
                 db.SaveChanges();
             }
         }
+
+        public static void ClearUserTokenCache()
+        {
+            using (var db = new ApplicationDbContext())
+            {
+                var cacheEntries = db.UserTokenCacheList
+                    .ToArray();
+                db.UserTokenCacheList.RemoveRange(cacheEntries);
+                db.SaveChanges();
+            }
+        }
+
+
     }
 }

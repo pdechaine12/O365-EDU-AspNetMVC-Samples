@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using EDUGraphAPI.Models;
 using AAD = Microsoft.Azure.ActiveDirectory.GraphClient;
 
 namespace EDUGraphAPI.Web.Controllers
@@ -113,6 +114,16 @@ namespace EDUGraphAPI.Web.Controllers
             TempData["Message"] = "Admin unconsented successfully!";
             return RedirectToAction("Index");
         }
+
+        // POST: /Admin/ClearAdalCache
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<ActionResult> ClearAdalCache()
+        {
+            AdalTokenCache.ClearUserTokenCache();
+            TempData["Message"] = "Login cache cleared successfully!";
+            return RedirectToAction("Index");
+        }
+
 
         //
         // GET: /Admin/LinkedAccounts
