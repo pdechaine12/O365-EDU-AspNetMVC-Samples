@@ -177,6 +177,21 @@
         ]
       },
       {
+        "title": "Get all students in my classes",
+        "tab": "studentsinmyclasses",
+        "files": [
+          {
+            "url": "/blob/master/src/Microsoft.Education/EducationServiceClient.cs",
+            "methods": [
+              {
+                "title": "GetMySectionsAsync",
+                "description": "Get all my classes with students."
+              }
+            ]
+          }
+        ]
+      },
+      {
         "title": "Get all students and teachers information",
         "tab": "filterall",
         "files": [
@@ -239,6 +254,10 @@
               {
                 "title": "ClassDetails",
                 "description": "Page action."
+              },
+              {
+                "title": "AddCoTeacher",
+                "description": "Add a co-teacher to a class."
               },
               {
                 "title": "GetSchoolsServiceAsync",
@@ -336,7 +355,7 @@
         ]
       },
       {
-        "title": "Dispaly, edit and save students charts",
+        "title": "Display, edit and save students charts",
         "tab": "#seatingchart",
         "files": [
           {
