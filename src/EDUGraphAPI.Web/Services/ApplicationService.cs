@@ -273,13 +273,12 @@ namespace EDUGraphAPI.Web.Services
             }
             return await dbContext.SaveChangesAsync();
         }
-
         /// <summary>
         /// Get all users from DB
         /// </summary>
         public async Task<ApplicationUser[]> GetAllUsers(Expression<Func<ApplicationUser, bool>> predicate = null)
         {
-            return await dbContext.Users                
+            return await dbContext.Users
                 .ToArrayAsync();
         }
         public async Task DeleteLocalUser(string id)
@@ -305,9 +304,9 @@ namespace EDUGraphAPI.Web.Services
             catch (Exception)
             {
 
-               
+
             }
-            
+
         }
         private string GetUserId()
         {
