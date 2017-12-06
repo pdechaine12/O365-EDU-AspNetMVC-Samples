@@ -2,11 +2,13 @@
  *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
  *   * See LICENSE in the project root for license information.  
  */
-namespace Microsoft.Education
+ namespace Microsoft.Education
 {
-    public static class EduConstants
+    public enum PhysicalAddressType
     {
-        public static string TeacherObjectType = "Teacher";
-        public static string StudentObjectType = "Student";
+        Unknown = 0,
+        Home = 1,
+        Business = 2,
+        Other = 3
     }
 }

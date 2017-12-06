@@ -16,6 +16,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.Education;
 
 namespace EDUGraphAPI.Web.Controllers
 {
@@ -53,7 +54,7 @@ namespace EDUGraphAPI.Web.Controllers
         {
             var userContext = await applicationService.GetUserContextAsync();
             var schoolsService = await GetSchoolsServiceAsync();
-            var model = await schoolsService.GetSectionsViewModelAsync(userContext, schoolId, pageSize);
+            var model = await schoolsService.GetSectionsViewModelAsync(userContext, schoolId);
             return View(model);
         }
 
@@ -63,59 +64,12 @@ namespace EDUGraphAPI.Web.Controllers
         {
             var userContext = await applicationService.GetUserContextAsync();
             var schoolsService = await GetSchoolsServiceAsync();
-            var model = await schoolsService.GetSectionsViewModelAsync(userContext, schoolId, pageSize, nextLink);
-            var sections = new List<Section>(model.Sections.Value);
-            sections.AddRange(model.MySections);
-            foreach (var section in sections)
-            {
-                if (!string.IsNullOrEmpty(section.TermStartDate))
-                {
-                    section.TermStartDate = Convert.ToDateTime(section.TermStartDate).ToString("yyyy-MM-ddTHH:mm:ss");
-                }
-                if (!string.IsNullOrEmpty(section.TermEndDate))
-                {
-                    section.TermEndDate = Convert.ToDateTime(section.TermEndDate).ToString("yyyy-MM-ddTHH:mm:ss");
-                }
-            }
+            var model = await schoolsService.GetSectionsViewModelAsync(userContext, schoolId, nextLink);
+            var classes = new List<EducationClass>(model.Classes.Value);
+            classes.AddRange(model.MyClasses);
             return Json(model, JsonRequestBehavior.AllowGet);
         }
 
-        //
-        // GET: /Schools/{Id of a school}/Users
-        public async Task<ActionResult> Users(string schoolId)
-        {
-            var schoolsService = await GetSchoolsServiceAsync();
-            var userContext = await applicationService.GetUserContextAsync();
-            var model = await schoolsService.GetSchoolUsersAsync(userContext,schoolId, pageSize);
-            return View(model);
-        }
-
-        //
-        // GET: /Schools/{Id of a school}/Users/Next
-        public async Task<JsonResult> UsersNext(string schoolId, string nextLink)
-        {
-            var schoolsService = await GetSchoolsServiceAsync();
-            var model = await schoolsService.GetSchoolUsersAsync(schoolId, pageSize, nextLink);
-            return Json(model, JsonRequestBehavior.AllowGet);
-        }
-
-        //
-        // GET: /Schools/{Id of a school}/Students/Next
-        public async Task<JsonResult> StudentsNext(string schoolId, string nextLink)
-        {
-            var schoolsService = await GetSchoolsServiceAsync();
-            var model = await schoolsService.GetSchoolStudentsAsync(schoolId, pageSize, nextLink);
-            return Json(model, JsonRequestBehavior.AllowGet);
-        }
-
-        //
-        // GET: /Schools/{Id of a school}/Teachers/Next
-        public async Task<JsonResult> TeachersNext(string schoolId, string nextLink)
-        {
-            var schoolsService = await GetSchoolsServiceAsync();
-            var model = await schoolsService.GetSchoolTeachersAsync(schoolId, pageSize, nextLink);
-            return Json(model, JsonRequestBehavior.AllowGet);
-        }
 
         //
         // GET: /Schools/{Id of a school}/Classes/6510F0FC-53B3-4D9B-9742-84C9C8FA2BE4
@@ -132,7 +86,7 @@ namespace EDUGraphAPI.Web.Controllers
             model.O365UserId = userContext.User.O365UserId;
             model.MyFavoriteColor = userContext.User.FavoriteColor;
             var assignmentServices = await GetAssignmentsServiceAsync();
-            model.Assignments = await assignmentServices.GetAssignmentsByClassId(model.Section.Id);
+            model.Assignments = await assignmentServices.GetAssignmentsByClassId(model.Class.Id);
             return View(model);
         }
 
@@ -179,12 +133,14 @@ namespace EDUGraphAPI.Web.Controllers
             {
                 await assignmentServices.PublishAssignmentAsync(classId, assignment.Id);
             }
+            var resourceFolder = await assignmentServices.GetAssignmentResourceFolderURL(classId, assignment.Id);
+
             var graphServiceClient = await AuthenticationHelper.GetGraphAssignmentServiceClientAsync();
             foreach (HttpPostedFileBase item in fileUpload)
             {
                 if (item != null)
                 {
-                    DriveItem file = await UploadFile(classId, graphServiceClient, item,assignment.ResourcesFolder.Odataid);
+                    DriveItem file = await UploadFile(classId, graphServiceClient, item, resourceFolder.ResourceFolderURL);
                     string resourceUrl = string.Format("https://graph.microsoft.com/v1.0/drives/{0}/items/{1}",file.ParentReference.DriveId,file.Id);
                     await assignmentServices.AddAssignmentResourcesAsync(classId, assignment.Id, file.Name, resourceUrl);
                 }
@@ -201,18 +157,17 @@ namespace EDUGraphAPI.Web.Controllers
             var assignmentServices = await GetAssignmentsServiceAsync();
             var graphServiceClient = await AuthenticationHelper.GetGraphAssignmentServiceClientAsync();
 
-            string resourcesFolderOdataid = string.Empty;
             var submissions = await assignmentServices.GetAssignmentSubmissionByUserAsync(classId, assignmentId, userContext.User.O365UserId);
-            var submission = submissions.Length > 0 ? submissions[0] : null;
-            resourcesFolderOdataid = submission.ResourcesFolder.Odataid;
-
-            foreach (HttpPostedFileBase item in newResource)
+            if (submissions.Length > 0)
             {
-                if (item != null)
+                foreach (HttpPostedFileBase item in newResource)
                 {
-                    DriveItem file = await UploadFile(classId, graphServiceClient, item, resourcesFolderOdataid);
-                    string resourceUrl = string.Format("https://graph.microsoft.com/v1.0/drives/{0}/items/{1}", file.ParentReference.DriveId, file.Id);
-                    await assignmentServices.AddSubmissionResourceAsync(classId, assignmentId, submissionId, file.Name, resourceUrl);
+                    if (item != null)
+                    {
+                        DriveItem file = await UploadFile(classId, graphServiceClient, item, submissions[0].ResourcesFolderUrl);
+                        string resourceUrl = string.Format("https://graph.microsoft.com/v1.0/drives/{0}/items/{1}", file.ParentReference.DriveId, file.Id);
+                        await assignmentServices.AddSubmissionResourceAsync(classId, assignmentId, submissionId, file.Name, resourceUrl);
+                    }
                 }
             }
             return RedirectToAction("ClassDetails", new { schoolId = schoolId, sectionId = classId, tab = "assignments" });
@@ -227,10 +182,11 @@ namespace EDUGraphAPI.Web.Controllers
                 assignment = await assignmentServices.PublishAssignmentAsync(classId, assignmentId);
             }
             var graphServiceClient = await AuthenticationHelper.GetGraphAssignmentServiceClientAsync();
+            var resourceFolder = await assignmentServices.GetAssignmentResourceFolderURL(classId, assignmentId);
             foreach (HttpPostedFileBase item in newResource){
                 if (item != null)
                 {
-                    DriveItem file = await UploadFile(classId, graphServiceClient, item, assignment.ResourcesFolder.Odataid);
+                    DriveItem file = await UploadFile(classId, graphServiceClient, item, resourceFolder.ResourceFolderURL);
                     string resourceUrl = string.Format("https://graph.microsoft.com/v1.0/drives/{0}/items/{1}", file.ParentReference.DriveId, file.Id);
                     await assignmentServices.AddAssignmentResourcesAsync(classId, assignment.Id, file.Name, resourceUrl);
                 }
@@ -245,12 +201,19 @@ namespace EDUGraphAPI.Web.Controllers
             string[] ids = GetIdsFromResourceFolder(resourceFolder);
             var exsitItems = await graphServiceClient.Drives[ids[0]].Items[ids[1]].Children.Request().Filter($"Name eq '{item.FileName}'").GetAsync();
             string itemId = string.Empty;
-            if(exsitItems.Count == 0)
+            string[] separatingChars = { "\\" };
+            string filename = item.FileName;
+            if (filename.IndexOf("\\") >= 0)
+            {
+                var a = filename.Split(separatingChars, StringSplitOptions.None);
+                filename = a[a.Length - 1];
+            }
+            if (exsitItems.Count == 0)
             {
                 var newItem = await graphServiceClient.Drives[ids[0]]
                             .Items[ids[1]].Children.Request().AddAsync(new DriveItem
                             {
-                                Name = item.FileName,
+                                Name = filename,
                                 File = new Microsoft.Graph.File()
                             });
                 itemId = newItem.Id;
@@ -293,7 +256,8 @@ namespace EDUGraphAPI.Web.Controllers
         
         private async Task<SchoolsService> GetSchoolsServiceAsync()
         {
-            var educationServiceClient = await AuthenticationHelper.GetEducationServiceClientAsync();
+            var educationServiceClient = EducationServiceClient.GetEducationServiceClient(
+                await AuthenticationHelper.GetAccessTokenAsync(Constants.Resources.MSGraph, Permissions.Delegated));
             return new SchoolsService(educationServiceClient, dbContext);
         }
 

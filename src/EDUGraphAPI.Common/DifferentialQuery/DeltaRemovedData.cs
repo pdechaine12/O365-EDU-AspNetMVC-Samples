@@ -7,11 +7,9 @@ using System.Collections.Generic;
 
 namespace EDUGraphAPI.DifferentialQuery
 {
-    public interface IDeltaEntity
+    public class DeltaRemovedData
     {
-        [JsonProperty("aad.isDeleted")]
-        bool IsDeleted { get; set; }
-
-        HashSet<string> ModifiedPropertyNames { get; }
+        [JsonProperty("reason")]
+        string RemovedReason { get; set; }
     }
 }
