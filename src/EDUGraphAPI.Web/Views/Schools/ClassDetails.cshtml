@@ -140,7 +140,7 @@
                            {
                             <tr class="tr-content">
                                 <td>@assignment.DisplayName</td>
-                                <td>@(string.IsNullOrEmpty(assignment.DueDateTime) ? "": Convert.ToDateTime(assignment.DueDateTime).ToString("M/dd/yyyy"))</td>
+                                <td class="assignmentdate">@(string.IsNullOrEmpty(assignment.DueDateTime) ? "": Convert.ToDateTime(assignment.DueDateTime).ToString("M/dd/yyyy"))</td>
                                 <td>@assignment.Status</td>
                                 <td>
 
