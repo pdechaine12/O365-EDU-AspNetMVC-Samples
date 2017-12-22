@@ -37,6 +37,7 @@ namespace EDUGraphAPI.Web.Services
             foreach (var item in result)
             {
                 item.ResourceFiles = Assignment.GetResourcesFiles(item.Resources);
+                item.DueDateTime = DateTimeOffset.Parse(item.DueDateTime).UtcDateTime.ToLocalTime().ToString("MM/dd/yyyy");
             }
             return result;
         }

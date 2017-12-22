@@ -83,13 +83,7 @@ function formatDateTime() {
             $e.text(moment.utc(dateStr).local().format('MM/DD/YYYY hh: mm: ss A'));
         }
     });
-    $(".assignmentdate").each(function (i, e) {
-        var $e = $(e);
-        var dateStr = $.trim($e.text());
-        if (dateStr) {
-            $e.text(moment.utc(dateStr).local().format('MM/DD/YYYY'));
-        }
-    });
+
 }
 
 function loadImages() {
