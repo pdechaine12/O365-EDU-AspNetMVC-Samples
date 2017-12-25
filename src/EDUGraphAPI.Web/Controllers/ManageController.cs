@@ -334,6 +334,12 @@ namespace EDUGraphAPI.Web.Controllers
                     await AuthenticationHelper.GetAccessTokenAsync(Constants.Resources.MSGraph, Permissions.Delegated));
                 var schoolsService = new SchoolsService(educationServiceClient, dbContext); 
                 model.Groups.AddRange(await schoolsService.GetMyClassesAsync());
+                if (userContext.IsAdmin)
+                    model.UserRole = "Admin";
+                else if (userContext.IsFaculty)
+                    model.UserRole = "Teacher";
+                else 
+                    model.UserRole = "Student";
             }
 
             if (showSaveMessage == true)

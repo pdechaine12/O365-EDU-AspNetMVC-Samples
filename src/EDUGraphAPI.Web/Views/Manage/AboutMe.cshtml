@@ -21,22 +21,7 @@
         <b>Username:</b><br /> @User.Identity.GetFullName() @Html.Raw(userPhoto)
     </div>
     <div class="margin-top-12 margin-btm-12">
-        @{
-            string displayRole = "";
-            if (User.IsInRole(Constants.Roles.Admin))
-            {
-                displayRole = "Admin";
-            }
-            else if (User.IsInRole(Constants.Roles.Faculty))
-            {
-                displayRole = "Teacher";
-            }
-            else if (User.IsInRole(Constants.Roles.Student))
-            {
-                displayRole = "Student";
-            }
-        }
-        <b>Logged in as:</b><br /> @displayRole
+        <b>Logged in as:</b><br /> @Model.UserRole
     </div>
     @if (Model.ShowFavoriteColor)
     {

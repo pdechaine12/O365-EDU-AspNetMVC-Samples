@@ -22,5 +22,7 @@ namespace EDUGraphAPI.Web.Models
         public List<string> Groups { get; set; }
 
         public bool ShowFavoriteColor { get; set; }
+
+        public string UserRole { get; set; }
     }
 }
