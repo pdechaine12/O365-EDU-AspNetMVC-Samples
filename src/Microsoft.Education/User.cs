@@ -37,7 +37,5 @@ namespace Microsoft.Education
         [JsonProperty("userPrincipalName")]
         public string UserPrincipalName { get; set; }
 
-        [JsonProperty("extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType")]
-        public string ObjectType { get; set; }
     }
 }

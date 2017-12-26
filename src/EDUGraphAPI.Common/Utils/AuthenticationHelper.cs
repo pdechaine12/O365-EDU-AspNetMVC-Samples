@@ -63,14 +63,14 @@ namespace EDUGraphAPI.Utils
         {
             var accessToken = await GetAccessTokenAsync(Constants.Resources.MSGraph, permissions);
             var serviceRoot = new Uri(new Uri(Constants.Resources.MSGraph), Constants.Resources.MSGraphVersion);
-            return new EducationServiceClient(serviceRoot, () => Task.FromResult(accessToken));
+            return new EducationServiceClient(serviceRoot, new BearerAuthenticationProvider(accessToken));
         }
 
         public static async Task<EducationServiceClient> GetAssignmentServiceClientAsync(Permissions permissions = Permissions.Delegated)
         {
             var accessToken = await GetAccessTokenAsync(Constants.Resources.MSGraph, permissions);
             var serviceRoot = new Uri(new Uri(Constants.Resources.MSGraph), Constants.Resources.MSGraphVersion);
-            return new EducationServiceClient(serviceRoot, () => Task.FromResult(accessToken));
+            return new EducationServiceClient(serviceRoot, new BearerAuthenticationProvider(accessToken));
         }
 
         public static async Task<GraphServiceClient> GetGraphAssignmentServiceClientAsync(Permissions permissions = Permissions.Delegated)

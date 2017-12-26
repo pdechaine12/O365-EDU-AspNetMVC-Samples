@@ -54,26 +54,17 @@ namespace EDUGraphAPI.Web.Models
         /// <summary>
         /// Is the logged-in user a faculty (teacher)
         /// </summary>
-        public bool IsFaculty
-        {
-            get;set;
-        }
+        public bool IsFaculty => HttpContext.User.IsInRole(Constants.Roles.Faculty);
 
         /// <summary>
         /// Is the logged-in user a student 
         /// </summary>
-        public bool IsStudent
-        {
-            get;set;
-        }
+        public bool IsStudent => HttpContext.User.IsInRole(Constants.Roles.Student);
 
         /// <summary>
         /// Is the logged-in user an administrator
         /// </summary>
-        public bool IsAdmin
-        {
-            get;set;
-        }
+        public bool IsAdmin => HttpContext.User.IsInRole(Constants.Roles.Admin);
 
         /// <summary>
         /// Is the use's tenant consented by a admin

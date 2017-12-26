@@ -3,11 +3,9 @@
  *   * See LICENSE in the project root for license information.  
  */
 using EDUGraphAPI.Data;
-using EDUGraphAPI.Utils;
 using EDUGraphAPI.Web.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.Education;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -119,19 +117,6 @@ namespace EDUGraphAPI.Web.Services
         {
             var currentUser = await GetCurrentUserAsync();
             UserContext context = new UserContext(HttpContext.Current, currentUser);
-            context.IsAdmin = HttpContext.Current.User.IsInRole(Constants.Roles.Admin);
-            if (currentUser!=null && !context.IsAdmin)
-            {
-                var educationServiceClient = Microsoft.Education.EducationServiceClient.GetEducationServiceClient(
-                    await AuthenticationHelper.GetAccessTokenAsync(Constants.Resources.MSGraph, Permissions.Delegated));
-                var user = await educationServiceClient.GetUserAsync();
-                if (user.PrimaryRole == EducationRole.Student)
-                    context.IsStudent = true;
-                if (user.PrimaryRole == EducationRole.Teacher)
-                    context.IsFaculty = true;
-            }
-            
-           
             return context;
         }
 

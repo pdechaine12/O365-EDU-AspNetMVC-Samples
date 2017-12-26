@@ -2,6 +2,8 @@
  *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
  *   * See LICENSE in the project root for license information.  
  */
+using EDUGraphAPI.Infrastructure;
+using EDUGraphAPI.Utils;
 using EDUGraphAPI.Web.Models;
 using Microsoft.Graph;
 using System.Collections.Generic;
@@ -24,6 +26,7 @@ namespace EDUGraphAPI.Web.Services.GraphClients
             var me = await graphServiceClient.Me.Request()
                 .Select("id,givenName,surname,userPrincipalName,assignedLicenses")
                 .GetAsync();
+            
             return new UserInfo
             {
                 Id = me.Id,
@@ -49,12 +52,18 @@ namespace EDUGraphAPI.Web.Services.GraphClients
         {
             var roles = new List<string>();
             var directoryAdminRole = await GetDirectoryAdminRoleAsync();
+            
             if (await directoryAdminRole.Members.AnyAsync(i => i.Id == user.Id))
                 roles.Add(Constants.Roles.Admin);
-            if (user.AssignedLicenses.Any(i => i.SkuId == Constants.O365ProductLicenses.Faculty || i.SkuId == Constants.O365ProductLicenses.FacultyPro))
-                roles.Add(Constants.Roles.Faculty);
-            if (user.AssignedLicenses.Any(i => i.SkuId == Constants.O365ProductLicenses.Student || i.SkuId == Constants.O365ProductLicenses.StudentPro))
-                roles.Add(Constants.Roles.Student);
+            if(roles.Count==0)
+            { 
+                var educationServiceClient = Microsoft.Education.EducationServiceClient.GetEducationServiceClient(this.graphServiceClient.AuthenticationProvider);
+                var me = await educationServiceClient.GetUserAsync();
+                if (me.PrimaryRole == Microsoft.Education.EducationRole.Student)
+                    roles.Add(Constants.Roles.Student);
+                if (me.PrimaryRole == Microsoft.Education.EducationRole.Teacher)
+                    roles.Add(Constants.Roles.Faculty);
+            }
             return roles.ToArray();
         }
 

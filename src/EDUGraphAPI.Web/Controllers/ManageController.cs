@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.Education;
+using EDUGraphAPI.Infrastructure;
 
 namespace EDUGraphAPI.Web.Controllers
 {
@@ -330,16 +331,10 @@ namespace EDUGraphAPI.Web.Controllers
 
             if (userContext.IsO365Account || userContext.AreAccountsLinked)
             {
-                var educationServiceClient = EducationServiceClient.GetEducationServiceClient(
-                    await AuthenticationHelper.GetAccessTokenAsync(Constants.Resources.MSGraph, Permissions.Delegated));
+                var accessToken = await AuthenticationHelper.GetAccessTokenAsync(Constants.Resources.MSGraph, Permissions.Delegated);                
+                var educationServiceClient = EducationServiceClient.GetEducationServiceClient(new BearerAuthenticationProvider(accessToken));
                 var schoolsService = new SchoolsService(educationServiceClient, dbContext); 
                 model.Groups.AddRange(await schoolsService.GetMyClassesAsync());
-                if (userContext.IsAdmin)
-                    model.UserRole = "Admin";
-                else if (userContext.IsFaculty)
-                    model.UserRole = "Teacher";
-                else 
-                    model.UserRole = "Student";
             }
 
             if (showSaveMessage == true)

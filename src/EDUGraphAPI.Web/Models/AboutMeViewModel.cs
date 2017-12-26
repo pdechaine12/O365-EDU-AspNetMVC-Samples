@@ -23,6 +23,5 @@ namespace EDUGraphAPI.Web.Models
 
         public bool ShowFavoriteColor { get; set; }
 
-        public string UserRole { get; set; }
     }
 }
