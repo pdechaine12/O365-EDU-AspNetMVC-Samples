@@ -439,6 +439,7 @@ namespace Microsoft.Education
             await authenticationProvider.AuthenticateRequestAsync(message);
 
             var client = new HttpClient();
+            var response = await client.SendAsync(message); 
             response.EnsureSuccessStatusCode();
             var responseString = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<T>(responseString);
