@@ -429,58 +429,22 @@ namespace Microsoft.Education
         }
         private async Task<T> HttpPostAsync<T>(string relativeUrl, string json)
         {
-            //var client = new HttpClient();
-            //client.DefaultRequestHeaders.Add("Authorization", await accessTokenGetter());
-            //var uri = serviceRoot + "/" + relativeUrl;
-            //var stringContent = new StringContent(json, UnicodeEncoding.UTF8,"application/json");
-            //var response = await client.PostAsync(uri, stringContent);
-            //var responseString = await response.Content.ReadAsStringAsync();
-            //return JsonConvert.DeserializeObject<T>(responseString);
             var uri = serviceRoot + "/" + relativeUrl;
             if (relativeUrl.ToLower().IndexOf("https://") >= 0)
             {
                 uri = relativeUrl;
             }
-            var message = new HttpRequestMessage(HttpMethod.Get, uri);
+            var message = new HttpRequestMessage(HttpMethod.Post, uri);
+            message.Content = new StringContent(json, UnicodeEncoding.UTF8, "application/json"); 
             await authenticationProvider.AuthenticateRequestAsync(message);
-            //message.DefaultRequestHeaders.Add("Authorization", await accessTokenGetter());
 
             var client = new HttpClient();
-            var response = await client.SendAsync(message);
             response.EnsureSuccessStatusCode();
             var responseString = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<T>(responseString);
-           
+
         }
 
-        //private async Task<T> HttpPatchAsync<T>(string relativeUrl, string json)
-        //{
-        //    //var client = new HttpClient();
-        //    //var method = new HttpMethod("PATCH");
-        //    //var uri = serviceRoot + "/" + relativeUrl;
-        //    //var stringContent = new StringContent(json, UnicodeEncoding.UTF8, "application/json");
-        //    //var request = new HttpRequestMessage(method, uri)
-        //    //{
-        //    //    Content = stringContent
-        //    //};
-        //    //client.DefaultRequestHeaders.Add("Authorization", await accessTokenGetter());
-        //    //var response = await client.SendAsync(request);
-        //    //var responseString = await response.Content.ReadAsStringAsync();
-        //    //return JsonConvert.DeserializeObject<T>(responseString);
-        //    var uri = serviceRoot + "/" + relativeUrl;
-        //    if (relativeUrl.ToLower().IndexOf("https://") >= 0)
-        //    {
-        //        uri = relativeUrl;
-        //    }
-        //    var message = new HttpRequestMessage(HttpMethod.Put, uri);
-        //    await authenticationProvider.AuthenticateRequestAsync(message);
-        //    //message.DefaultRequestHeaders.Add("Authorization", await accessTokenGetter());
-
-        //    var client = new HttpClient();
-        //    var response = await client.SendAsync(message);
-        //    response.EnsureSuccessStatusCode();
-        //    return await response.Content.ReadAsStringAsync();
-        //}
 
         private string GetFileType(string fileName)
         {
