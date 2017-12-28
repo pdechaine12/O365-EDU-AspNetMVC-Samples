@@ -383,8 +383,7 @@ namespace Microsoft.Education
                 uri = relativeUrl;
             }
             var message = new HttpRequestMessage(HttpMethod.Get, uri);
-            await authenticationProvider.AuthenticateRequestAsync(message);
-            //message.DefaultRequestHeaders.Add("Authorization", await accessTokenGetter());
+            await authenticationProvider.AuthenticateRequestAsync(message);           
 
             var client = new HttpClient();
             var response = await client.SendAsync(message);            
@@ -437,7 +436,6 @@ namespace Microsoft.Education
             var message = new HttpRequestMessage(HttpMethod.Post, uri);
             message.Content = new StringContent(json, UnicodeEncoding.UTF8, "application/json"); 
             await authenticationProvider.AuthenticateRequestAsync(message);
-
             var client = new HttpClient();
             var response = await client.SendAsync(message); 
             response.EnsureSuccessStatusCode();
