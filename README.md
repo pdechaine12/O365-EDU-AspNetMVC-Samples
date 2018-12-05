@@ -1,8 +1,8 @@
 # EDUGraphAPI - Office 365 Education Code Sample
 
-In this sample we show you how to integrate with school roles/roster data as well as O365 services available via the Graph API. 
+In this sample we show you how to integrate with school roles/roster data as well as Office 365 services available via the Microsoft Graph API. 
 
-School data is kept in sync in O365 Education tenants by [Microsoft School Data Sync](http://sds.microsoft.com).  
+School data is kept in sync in Office 365 Education tenants by [Microsoft School Data Sync](http://sds.microsoft.com).  
 
 **Table of contents**
 * [Sample Goals](#sample-goals)
@@ -19,7 +19,7 @@ School data is kept in sync in O365 Education tenants by [Microsoft School Data 
 
 The sample demonstrates:
 
-* Calling Graph APIs, including:
+* Calling Microsoft Graph APIs, including:
 
   * [Microsoft Azure Active Directory Graph API](https://www.nuget.org/packages/Microsoft.Azure.ActiveDirectory.GraphClient/)
   * [Microsoft Graph API](https://www.nuget.org/packages/Microsoft.Graph/)
