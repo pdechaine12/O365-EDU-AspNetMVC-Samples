@@ -18,7 +18,7 @@ extensions:
   scenarios:
   - Education
 ---
-# EDUGraphAPI - Office 365 Education Code Sample
+# EDUGraphAPI - Office 365 Education Code Sample (ASP.NET MVC)
 
 In this sample we show you how to integrate with school roles/roster data as well as O365 services available via the Graph API. 
 
