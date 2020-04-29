@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.Education;
+using EDUGraphAPI.Infrastructure;
 
 namespace EDUGraphAPI.Web.Controllers
 {
@@ -256,8 +257,8 @@ namespace EDUGraphAPI.Web.Controllers
         
         private async Task<SchoolsService> GetSchoolsServiceAsync()
         {
-            var educationServiceClient = EducationServiceClient.GetEducationServiceClient(
-                await AuthenticationHelper.GetAccessTokenAsync(Constants.Resources.MSGraph, Permissions.Delegated));
+            var accessToken = await AuthenticationHelper.GetAccessTokenAsync(Constants.Resources.MSGraph, Permissions.Delegated);
+            var educationServiceClient = EducationServiceClient.GetEducationServiceClient(new BearerAuthenticationProvider(accessToken));
             return new SchoolsService(educationServiceClient, dbContext);
         }
 

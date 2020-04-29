@@ -36,5 +36,6 @@ namespace Microsoft.Education
 
         [JsonProperty("userPrincipalName")]
         public string UserPrincipalName { get; set; }
+
     }
 }
