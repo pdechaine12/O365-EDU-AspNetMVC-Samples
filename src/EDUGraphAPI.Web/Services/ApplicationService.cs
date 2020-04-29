@@ -116,7 +116,8 @@ namespace EDUGraphAPI.Web.Services
         public async Task<UserContext> GetUserContextAsync()
         {
             var currentUser = await GetCurrentUserAsync();
-            return new UserContext(HttpContext.Current, currentUser);
+            UserContext context = new UserContext(HttpContext.Current, currentUser);
+            return context;
         }
 
         /// <summary>

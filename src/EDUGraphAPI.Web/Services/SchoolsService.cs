@@ -37,6 +37,7 @@ namespace EDUGraphAPI.Web.Services
             foreach (var item in result)
             {
                 item.ResourceFiles = Assignment.GetResourcesFiles(item.Resources);
+                item.DueDateTime = DateTimeOffset.Parse(item.DueDateTime).UtcDateTime.ToLocalTime().ToString("MM/dd/yyyy");
             }
             return result;
         }
@@ -165,6 +166,17 @@ namespace EDUGraphAPI.Web.Services
             // Courses not currently represented.
             mySections = mySections.OrderBy(c => c.DisplayName).ToArray();
             var allSections = await educationServiceClient.GetAllClassesAsync(school.Id, null);
+            foreach (var section in allSections.Value)
+            {
+                foreach (var mySection in mySections)
+                {
+                    if (section.Id == mySection.Id)
+                    {
+                        section.Teachers = mySection.Teachers;                        
+                        section.Members = mySection.Members;
+                    }
+                }
+            }
             return new SectionsViewModel(userContext, school, allSections, mySections);
         }
 
@@ -176,7 +188,17 @@ namespace EDUGraphAPI.Web.Services
             var school = await educationServiceClient.GetSchoolAsync(objectId);
             var mySections = await educationServiceClient.GetMyClassesAsync(school.SchoolNumber);
             var allSections = await educationServiceClient.GetAllClassesAsync(school.Id, nextLink);
-
+            foreach (var section in allSections.Value)
+            {
+                foreach (var mySection in mySections)
+                {
+                    if (section.Id == mySection.Id)
+                    {
+                        section.Teachers = mySection.Teachers;
+                        section.Members = mySection.Members;
+                    }
+                }
+            }
             return new SectionsViewModel(userContext.UserO365Email, school, allSections, mySections);
         }
 

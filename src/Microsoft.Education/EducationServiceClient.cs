@@ -3,6 +3,7 @@
  *   * See LICENSE in the project root for license information.  
  */
 using Microsoft.Education.Data;
+using Microsoft.Graph;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -24,12 +25,12 @@ namespace Microsoft.Education
     public class EducationServiceClient
     {
         private readonly string serviceRoot;
-        private readonly Func<Task<string>> accessTokenGetter;
+        private readonly IAuthenticationProvider authenticationProvider;
 
-        public EducationServiceClient(Uri serviceRoot, Func<Task<string>> accessTokenGetter)
+        public EducationServiceClient(Uri serviceRoot, IAuthenticationProvider authenticationProvider)
         {
             this.serviceRoot = serviceRoot.ToString().TrimEnd('/');
-            this.accessTokenGetter = accessTokenGetter;
+            this.authenticationProvider = authenticationProvider;
         }
 
         #region schools
@@ -376,15 +377,16 @@ namespace Microsoft.Education
         #region HttpGet
         private async Task<string> HttpGetAsync(string relativeUrl)
         {
-            var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("Authorization", await accessTokenGetter());
-
             var uri = serviceRoot + "/" + relativeUrl;
             if (relativeUrl.ToLower().IndexOf("https://") >= 0)
             {
                 uri = relativeUrl;
             }
-            var response = await client.GetAsync(uri);
+            var message = new HttpRequestMessage(HttpMethod.Get, uri);
+            await authenticationProvider.AuthenticateRequestAsync(message);           
+
+            var client = new HttpClient();
+            var response = await client.SendAsync(message);            
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsStringAsync();
         }
@@ -426,30 +428,22 @@ namespace Microsoft.Education
         }
         private async Task<T> HttpPostAsync<T>(string relativeUrl, string json)
         {
-            var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("Authorization", await accessTokenGetter());
             var uri = serviceRoot + "/" + relativeUrl;
-            var stringContent = new StringContent(json, UnicodeEncoding.UTF8,"application/json");
-            var response = await client.PostAsync(uri, stringContent);
+            if (relativeUrl.ToLower().IndexOf("https://") >= 0)
+            {
+                uri = relativeUrl;
+            }
+            var message = new HttpRequestMessage(HttpMethod.Post, uri);
+            message.Content = new StringContent(json, UnicodeEncoding.UTF8, "application/json"); 
+            await authenticationProvider.AuthenticateRequestAsync(message);
+            var client = new HttpClient();
+            var response = await client.SendAsync(message); 
+            response.EnsureSuccessStatusCode();
             var responseString = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<T>(responseString);
+
         }
 
-        private async Task<T> HttpPatchAsync<T>(string relativeUrl, string json)
-        {
-            var client = new HttpClient();
-            var method = new HttpMethod("PATCH");
-            var uri = serviceRoot + "/" + relativeUrl;
-            var stringContent = new StringContent(json, UnicodeEncoding.UTF8, "application/json");
-            var request = new HttpRequestMessage(method, uri)
-            {
-                Content = stringContent
-            };
-            client.DefaultRequestHeaders.Add("Authorization", await accessTokenGetter());
-            var response = await client.SendAsync(request);
-            var responseString = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<T>(responseString);
-        }
 
         private string GetFileType(string fileName)
         {
@@ -474,10 +468,10 @@ namespace Microsoft.Education
         /// <summary>
         /// Get an instance of EducationServiceClient
         /// </summary>
-        public static EducationServiceClient GetEducationServiceClient(string accessToken)
+        public static EducationServiceClient GetEducationServiceClient( IAuthenticationProvider authenticationProvider)
         {
             var serviceRoot = new Uri(new Uri(Constants.Resources.MSGraph), Constants.Resources.MSGraphVersion);
-            return new EducationServiceClient(serviceRoot, () => Task.FromResult(accessToken));
+            return new EducationServiceClient(serviceRoot, authenticationProvider);
         }
     }
 }

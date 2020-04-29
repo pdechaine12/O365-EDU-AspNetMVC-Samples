@@ -83,6 +83,7 @@ function formatDateTime() {
             $e.text(moment.utc(dateStr).local().format('MM/DD/YYYY hh: mm: ss A'));
         }
     });
+
 }
 
 function loadImages() {
