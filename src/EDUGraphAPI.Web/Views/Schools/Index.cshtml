@@ -62,6 +62,7 @@
                     <th class="tdleft">
                         School Name
                     </th>
+                    <th>School Number</th>
                     <th>
                         Principal
                     </th>
@@ -83,6 +84,7 @@
                     }
                     <tr class="tr-content @style">
                         <td>@Html.Raw(string.IsNullOrEmpty(school.Name) ? "-" : school.Name) </td>
+                        <td>@school.SchoolNumber</td>
                         <td>@Html.Raw(string.IsNullOrEmpty(school.PrincipalName) ? "-" : school.PrincipalName)</td>
                         <td>@school.LowestGrade - @school.HighestGrade</td>
                         <td>

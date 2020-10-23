@@ -76,7 +76,7 @@ namespace Microsoft.Education
             }
             else
             {
-                var relativeUrl = $"education/schools/{schoolId}/classes?$top=12";
+                var relativeUrl = $"education/schools/{schoolId}/classes?$top=12&$expand=Teachers";
                 return await HttpGetArrayAsync<EducationClass>(relativeUrl, nextLink);
 
         
@@ -150,7 +150,13 @@ namespace Microsoft.Education
         /// <returns>The class.</returns>
         public async Task<EducationClass> GetClassAsync(string classId)
         {
-            return await HttpGetObjectAsync<EducationClass>($"education/classes/{classId}?$expand=members");
+            var result = await HttpGetObjectAsync<EducationClass>($"education/classes/{classId}?$expand=members");
+            
+            //var teachers = await HttpGetArrayAsync<EducationUser>($"education/classes/{classId}/Teachers");
+            //var teachers = await HttpGetObjectAsync<EducationClass>($"education/classes/{classId}?$expand=teachers");
+            //result.Teachers = teachers.ToList();
+            
+            return result;
         }
 
         #endregion
@@ -180,7 +186,7 @@ namespace Microsoft.Education
 
 
         /// <summary>
-        /// Get the current logged in user with expanded relationships suitab le for joining
+        /// Get the current logged in user with expanded relationships suitable for joining
         /// </summary>
         /// <returns>User.</returns>
         public Task<EducationUser> GetJoinableUserAsync()
@@ -403,7 +409,8 @@ namespace Microsoft.Education
             string responseString = await HttpGetAsync(relativeUrl);
             var array = JsonConvert.DeserializeObject<ArrayResult<T>>(responseString);
             var result = new List<T>();
-            result.AddRange(array.Value);
+            if(array.Value != null)
+                result.AddRange(array.Value);
 
             // NEVER do path-math on a nextToken - they are defined as opaque
             while (!string.IsNullOrEmpty(array.NextLink))

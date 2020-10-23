@@ -365,3 +365,5 @@ obj/
 
 ### TFS ###
 BuildProcessTemplates/
+
+web.config

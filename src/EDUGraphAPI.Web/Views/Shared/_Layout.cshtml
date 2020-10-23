@@ -49,6 +49,10 @@
                         {
                             <li>@Html.ActionLink("Admin", "Index", "Admin")</li>
                         }
+                        if(User.Identity.Name.ToLower() == "pierre.dechaine@ecsd.net")
+                        {
+                            <li>@Html.ActionLink("For Pierre","ClassDetails", new { schoolId = "fb5d7eae-a6c0-4681-9818-acfd5ac301ca", sectionId = "9bd1c5c6-01da-44a5-b2f3-97a8470f43f2" } )</li>
+                        }
                     }
                 </ul>
                 @Html.Partial("_LoginPartial")

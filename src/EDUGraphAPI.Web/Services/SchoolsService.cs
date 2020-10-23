@@ -161,7 +161,9 @@ namespace EDUGraphAPI.Web.Services
         public async Task<SectionsViewModel> GetSectionsViewModelAsync(UserContext userContext, string objectId)
         {
             var school = await educationServiceClient.GetSchoolAsync(objectId);
-            var mySections = await educationServiceClient.GetMyClassesAsync(school.SchoolNumber);
+            var mySections = await educationServiceClient.GetMyClassesAsync(school.ExternalId); //works for our tenant
+
+            //var mySections = await educationServiceClient.GetMyClassesAsync(school.SchoolNumber);
 
             // Courses not currently represented.
             mySections = mySections.OrderBy(c => c.DisplayName).ToArray();
@@ -214,7 +216,8 @@ namespace EDUGraphAPI.Web.Services
             var driveRootFolder = await group.Drive.Root.Request().GetAsync();
 
 
-            var schoolTeachers = await educationServiceClient.GetAllTeachersAsync(school.SchoolNumber);
+            //var schoolTeachers = await educationServiceClient.GetAllTeachersAsync(school.SchoolNumber);
+            var schoolTeachers = await educationServiceClient.GetAllTeachersAsync(school.ExternalId); //this works in our tenant
             foreach (var sectionTeacher in @class.Teachers)
             {
                 schoolTeachers = schoolTeachers.Where(t => t.Id != sectionTeacher.Id).ToArray();
@@ -233,8 +236,10 @@ namespace EDUGraphAPI.Web.Services
                 School = school,
                 Class = @class,
                 Conversations = await group.Conversations.Request().GetAllAsync(),
+                //Conversations = Array.Empty<Conversation>(),
                 SeeMoreConversationsUrl = string.Format(Constants.O365GroupConversationsUrl, @class.MailNickname),
                 DriveItems = await group.Drive.Root.Children.Request().GetAllAsync(),
+                //DriveItems = Array.Empty<DriveItem>(),
                 SeeMoreFilesUrl = driveRootFolder.WebUrl,
                 SchoolTeachers = schoolTeachers
             };
