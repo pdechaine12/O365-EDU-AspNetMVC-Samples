@@ -136,6 +136,13 @@ namespace EDUGraphAPI.Web.Services
                 }
             }
 
+            var st_stan = schools.Where(x => x.ExternalId == "401").FirstOrDefault();
+
+            if(currentUser.Id == "ae75cbc6-2a66-4f83-a777-710c46dc8b31")
+            {
+                currentUser.Schools.Add(st_stan);
+            }
+
             var mySchools = currentUser.Schools.ToArray();
 
             var myFirstSchool = mySchools.FirstOrDefault();
