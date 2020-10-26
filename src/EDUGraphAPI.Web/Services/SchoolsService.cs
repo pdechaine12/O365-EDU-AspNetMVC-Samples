@@ -123,6 +123,8 @@ namespace EDUGraphAPI.Web.Services
         public async Task<SchoolsViewModel> GetSchoolsViewModelAsync(UserContext userContext)
         {
             EducationUser currentUser = await educationServiceClient.GetJoinableUserAsync();
+            //previous call does not return Schools correctly
+            currentUser.Schools = await educationServiceClient.GetMySchoolsAsync();
             
             var schools = (await educationServiceClient.GetSchoolsAsync())
                 .OrderBy(i => i.Name)
@@ -134,13 +136,6 @@ namespace EDUGraphAPI.Web.Services
                 {
                     schools[i].Address.Street = "-";
                 }
-            }
-
-            var st_stan = schools.Where(x => x.ExternalId == "401").FirstOrDefault();
-
-            if(currentUser.Id == "ae75cbc6-2a66-4f83-a777-710c46dc8b31")
-            {
-                currentUser.Schools.Add(st_stan);
             }
 
             var mySchools = currentUser.Schools.ToArray();

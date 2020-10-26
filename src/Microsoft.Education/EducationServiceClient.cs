@@ -54,6 +54,12 @@ namespace Microsoft.Education
             return HttpGetObjectAsync<EducationSchool>($"education/schools/{objectId}");
         }
 
+        public async Task<EducationSchool[]> GetMySchoolsAsync()
+        {
+            var schools = await HttpGetArrayAsync<EducationSchool>("education/me/schools");
+            return schools.ToArray();
+        }
+
         #endregion
 
         #region classes
@@ -78,8 +84,6 @@ namespace Microsoft.Education
             {
                 var relativeUrl = $"education/schools/{schoolId}/classes?$top=12&$expand=Teachers";
                 return await HttpGetArrayAsync<EducationClass>(relativeUrl, nextLink);
-
-        
             }
         }
 
